@@ -10,7 +10,7 @@ void Print_array( RDS(double, array) ){
     } Prnl;
 }
 
-void Intercambia_lst( RDS_ptr(double, array), int c1, int c2){
+void Intercambia_lst( pRDS(double, array), int c1, int c2){
     Swap_lst_ptr(array,double,c1,c2);
 }
 
@@ -26,7 +26,7 @@ Main
     Swap_lst(x,double,0,2); 
     Print_array( SDS(x) );
 
-    Intercambia_lst( SDS_ptr(x), 1,2); Throw( salida );
+    Intercambia_lst( pSDS(x), 1,2); Throw( salida );
     Print_array( SDS(x) );
     
  salida:
