@@ -11,7 +11,7 @@ void Print_array( RDS(int, array) ){
     } Prnl
 }
 
-void Intercambia_filas( RDS_ptr(int, array), int f1, int f2){
+void Intercambia_filas( pRDS(int, array), int f1, int f2){
     Swap_rows_ptr(array,int,f1,f2);
 //    return array;
 }
@@ -30,7 +30,7 @@ Main
     if( Is_ok ){
        Print_array( SDS(x) );
     }
-    Intercambia_filas( SDS_ptr(x), 0,1);
+    Intercambia_filas( pSDS(x), 0,1);
     if( Is_ok ){
        Print_array( SDS(x) );
     }
