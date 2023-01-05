@@ -6,9 +6,9 @@ LIB_GADGET_START
 Main
    Fill array x as float(10,5) with ceil(rand()%100);
 
-   Do_it ( Print_if( Equal_arrays(SDS_ptr(x),SDS_ptr(y)),"%s", "Son tablas iguales\n","No son iguales\n");,
+   Do_it ( Print_if( Equal_arrays( pSDS(x), pSDS(y)),"%s", "Son tablas iguales\n","No son iguales\n");,
            Where ( New array y as float;),
-           Then  ( y = Clone_array(SMD(&y), SDS_ptr(x)); ) )  
+           Then  ( y = Clone_array(SMD(&y), pSDS(x)); ) )  
 
    Free array x,y;
 
@@ -18,9 +18,9 @@ Main
    Do_it ( Print_if( sw, "%s", "Son tablas iguales\n", "No son iguales\n" );,
            Where ( New array v as string;
                    int sw = 0; ),
-           Then  ( v = Clone_array( SMD( &v ), SDS_ptr(w) );
+           Then  ( v = Clone_array( SMD( &v ), pSDS(w) );
                    Let( $w[1,1], "distinto" );
-                   sw = Equal_arrays( SDS_ptr(w), SDS_ptr(v) ); 
+                   sw = Equal_arrays( pSDS(w), pSDS(v) ); 
                    Free str array v,w; ))
    
 End
