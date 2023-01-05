@@ -15,7 +15,7 @@ void Print_array( RDS(double, array) ){
     } Prnl;
 }
 
-void Intercambia_pags( RDS_ptr(double, array), int c1, int c2){
+void Intercambia_pags( pRDS(double, array), int c1, int c2){
     Swap_pags_ptr(array,double,c1,c2);
 }
 
@@ -31,7 +31,7 @@ Main
     Swap_pags(x,double,0,2); 
     Print_array( SDS(x) );
 
-    Intercambia_pags( SDS_ptr(x), 1,2); Throw( salida );
+    Intercambia_pags( pSDS(x), 1,2); Throw( salida );
     Print_array( SDS(x) );
     
  salida:
