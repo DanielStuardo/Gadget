@@ -13,7 +13,7 @@ void Print_array( RDS(double, array) ){
     } Prnl;
 }
 
-void Intercambia_cols( RDS_ptr(double, array), int c1, int c2){
+void Intercambia_cols( pRDS(double, array), int c1, int c2){
     Swap_cols_ptr(array,double,c1,c2);
 }
 
@@ -29,7 +29,7 @@ Main
     Swap_cols(x,double,0,2); 
     Print_array( SDS(x) );
 
-    Intercambia_cols( SDS_ptr(x), 1,2); Throw( salida );
+    Intercambia_cols( pSDS(x), 1,2); Throw( salida );
     Print_array( SDS(x) );
     
  salida:
