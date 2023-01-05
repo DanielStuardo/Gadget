@@ -49,8 +49,8 @@ punto anteriormente.
 
 A continuación se generará el programa "gadget_prepre", que realiza
 un preprocesamiento previo del programa del usuario antes de pasarlo 
-al compilador GCC. Este procesamiento convierte algunos atajos sintác-
-ticos en macros de la librería Gadget.
+al compilador GCC. Este procesamiento convierte algunos atajos sintácticos
+en macros de la librería Gadget.
 
 El programa gadget_prepre será copiado al directorio /usr/bin.
 También será movido a un directorio creado dentro del directorio
