@@ -2429,6 +2429,51 @@ do{\
 /* obtiene coordenadas virtuales de arrays n-dimensionales */
 #define Get_coor(_X_, _M_,...) CONCAT2(Get_coor_, COUNT_ARGUMENTS(__VA_ARGS__))(_X_, _M_, ##__VA_ARGS__)
 
+
+/* SCAN simple ascendete y descendente */
+
+#define Rev_scan(_X_, _V_, _D_, _LOW_, _HIGH_)     __Scan_Array__(_X_, _V_, _D_, _LOW_, _HIGH_,>, --)
+#define Scan(_X_, _V_, _D_, _LOW_, _HIGH_)     __Scan_Array__(_X_, _V_, _D_, _LOW_, _HIGH_,<, ++)
+#define __Scan_Array__(_X_, _V_, _D_, _LOW_, _HIGH_,_OP_,_OP1_)\
+do{\
+   int i;\
+   _V_=-1;\
+   for(i=(_LOW_); i _OP_ (_HIGH_); i _OP1_ ){\
+       if ( _X_[i] == _D_ ){\
+           _V_ = i;break;\
+       }\
+   }\
+}while(0);
+
+/* SCAN simple para strings */
+#define sRev_scan(_X_, _V_, _D_, _LOW_, _HIGH_)     __Scan_Str_Array__(_X_, _V_, _D_, _LOW_, _HIGH_,>, --)
+#define sScan(_X_, _V_, _D_, _LOW_, _HIGH_)     __Scan_Str_Array__(_X_, _V_, _D_, _LOW_, _HIGH_,<, ++)
+#define __Scan_Str_Array__(_X_, _V_, _D_, _LOW_, _HIGH_,_OP_,_OP1_)\
+do{\
+   int i;\
+   _V_=-1;\
+   for(i=(_LOW_); i _OP_ (_HIGH_); i _OP1_ ){\
+       if ( strcmp( _X_[i], _D_ ) == 0 ){\
+           _V_ = i;break;\
+       }\
+   }\
+}while(0);
+
+/* BINARY SCAN simple para numeros */
+#define bScan(_X_, _V_, _D_, _LOW_, _HIGH_) \
+do{\
+  int mid=0,swFound=0;\
+  int low = (_LOW_);\
+  int high = (_HIGH_);\
+  while (low <= high) {\
+    mid = low + (high - low) / 2;\
+    if (_X_[mid] == _D_) { swFound=1; break; }\
+    if (_X_[mid] < _D_)  low = mid + 1;\
+    else  high = mid - 1;\
+  }\
+  _V_ = swFound ? mid : -1;\
+}while(0);
+
 /**********************************************************************/
 
 
@@ -3956,7 +4001,8 @@ void push_stack_str(const char * cString);
 #define  Bold_off               printf("\033[22m");
 #define  Bold                   printf("\033[1m");
 
-#define  Resize_terminal(_X_,_Y_)    printf("\033[8;%d;%dt",_X_,_Y_);FlushOut;
+#define  Resize_terminal(_X_,_Y_)    printf("\033[8;%d;%dt",_X_,_Y_);FlushOut;\
+                                     Get_size_terminal();
 #define  Open_buffer             printf("\033[?1049h\033[H");
 #define  Close_buffer            printf("\033[?1049l");
 
