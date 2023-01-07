@@ -93,7 +93,11 @@ void put_information(RDS(MT_CELL, elem), int i)
     At 4,56; Print "Conf. electrónica:";
     At 5,56; Print "       %s", (char*)$s-elem[i,14];
     At 7,56; Print "Estados de oxidación:";
-    At 8,56; Print "       %s", (char*)$s-elem[i,15];
+    if ( Cell_type(elem,i,15) == string_TYPE ){
+        At 8,56; Print "       %s", (char*)$s-elem[i,15];
+    }else{
+        At 8,56; Print "       %ld", $l-elem[i,15];
+    }
     At 10,56; Print "Número Atómico: %ld",$l-elem[i,4];
     Reset_color;
 }
