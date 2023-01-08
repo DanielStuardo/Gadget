@@ -30,7 +30,7 @@ void Init_video( GD_VIDEO * video /*, int rows, int cols*/){
    video->video_cols = cols;
    /* declaro el doble de espacio, por si lo impreso más los carcateres de escape
       superan el máximo de la pantalla. */
-   video->video_mem = (unsigned char *) calloc(rows * cols * 2+1, 1);
+   video->video_mem = (unsigned char *) calloc(rows * cols * 5+1, 1);
    video->count_buffer=0;
 /*   video->video_color = ( int **) calloc( rows*cols, sizeof( int*));
    video->video_color[ 0 ] = (unsigned int *) calloc( cols, sizeof(unsigned int) );
