@@ -46,7 +46,7 @@ void Init_video( GD_VIDEO * video /*, int rows, int cols*/){
    //    video->video_mem
 //   video->count_color=0;
    //memset((void *)video->video_color, 0, rows*cols*3);
-   memset((void *)video->video_mem, ' ', rows*cols*2);
+   memset((void *)video->video_mem, ' ', rows*cols*5);
    video->video_mem[0]='\0';
    
    VID_ACTUAL_ROW=0; VID_ACTUAL_COL=0;
@@ -150,7 +150,7 @@ void _Move_y_(GD_VIDEO * video, int col){
 /* borra un buffer de video partcular */
 void _Delete_video_(GD_VIDEO * video){
    video->count_buffer = 0;
-   memset((void *)video->video_mem, ' ', video->video_rows*video->video_cols*2);
+   memset((void *)video->video_mem, ' ', video->video_rows*video->video_cols*5);
    video->video_mem[0]='\0';
 }
 
