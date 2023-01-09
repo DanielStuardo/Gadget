@@ -640,6 +640,7 @@ do{\
         int SIZE_BINARY=0;\
         int DECIMAL_POINT=46;\
         int MAX_LENGTH_READ=512;\
+        int TYPED_STRING=0;\
         int SEPARATOR_MILLARS=44;\
         int PILA_GADGET=0,CONTADOR_PILA=-1;\
         int SCREEN_ROW=1, SCREEN_COL=1;\
@@ -2837,14 +2838,36 @@ char * Read_string( int, int );
 F_STAT Stat_file( const char * );
 
 /***************************************************************************
-                   KEYBOARD Y TERMIOS 
- ******************************************************************************/
+                   
+                            KEYBOARD Y TERMIOS 
+                   
+ ***************************************************************************/
  
 #define Flush_out     fflush(stdout);
 #define Flush_inp     fflush(stdin);while( Kbhit() ) Getch();
 
 /* imprime array simple en la ubicacion del cursor */
 #define Print_array(_X_,_DX_)   _imprime_input_item_array_(_X_,_DX_)
+
+/* definiciones TEMPORALES para el uso de las funciones Key_put_xxx() 
+   Deberá cambiarlas si su teclado es de otro tipo, distinto al mío.
+   Consulte X11/keysymdef.h para más información */
+#define KEYP_ENTER                   0xff8d  /* Enter */
+#define KEYP_HOME                    0xff50
+#define KEYP_LEFT                    0xff51  /* Move left, left arrow */
+#define KEYP_UP                      0xff52  /* Move up, up arrow */
+#define KEYP_RIGHT                   0xff53  /* Move right, right arrow */
+#define KEYP_DOWN                    0xff54  /* Move down, down arrow */
+#define KEYP_PRIOR                   0xff55  /* Prior, previous */
+#define KEYP_PAGEUP                  0xff55
+#define KEYP_NEXT                    0xff56  /* Next */
+#define KEYP_PAGEDOWN                0xff56
+#define KEYP_END                     0xff57  /* EOL */
+#define KEYP_BEGIN                   0xff58  /* BOL */
+#define KEYP_ESCAPE                  0xff1b 
+#define KEYP_DELETE                  0xffff  /* Delete, rubout */
+#define KEYP_BACKSP                  0xff08  /* Back space, back char */
+#define KEYP_TAB                     0xff09
 
 /* HABILITACION DE RAW-MODE Y FUNCIONES AD-HOC */
 
@@ -2879,6 +2902,16 @@ int Pause();
 void _imprime_input_item_array_(RDS(char *,array));
 char * Input( char * cText, int nSpace );
 
+/* simulacion de input */
+void Key_put(unsigned int nKey);
+void Key_put_ctrl(unsigned int nKey);
+void Key_put_shift(unsigned int nKey);
+void Key_put_alt(unsigned int nKey);
+
+/* pone un texto en el buffer del teclado STDIN */
+void Put_kbd_text(const char* cKey);
+/* lee el texto puesto en el STDIN */
+char * Read_typed_string();
 
 /************************************************************************
  *
