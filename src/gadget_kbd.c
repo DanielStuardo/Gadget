@@ -26,6 +26,7 @@ extern int ENABLE_RAW_MODE;
 extern int SCREEN_ROW;
 extern int SCREEN_COL;
 extern int Is_ok;
+extern int TYPED_STRING;
 
 
 /* HABILITACION DE RAW-MODE Y FUNCIONES AD-HOC */
@@ -397,5 +398,65 @@ char * Input( char * cText, int nSpace ){
    }
    sFree_array(cBuffer);
    return retVal;
+}
+
+/*
+  Funciones para simular la entrada de teclado.
+  
+  Estas funciones son tramposas, porque ejecuto XDOTOOL de
+  Jordan Sissel.
+  https://github.com/jordansissel/xdotool
+*/
+void Key_put(unsigned int nKey){
+    char sKey[50];
+    Flush_inp;
+    sprintf( sKey, "xdotool key --delay 1 --repeat 1 0x%X", nKey);
+    system( sKey );
+}
+
+void Key_put_ctrl(unsigned int nKey){
+    char sKey[50];
+    Flush_inp;
+    sprintf( sKey, "xdotool key --delay 1 --repeat 1 ctrl+%c", nKey);
+    system( sKey );
+}
+
+void Key_put_shift(unsigned int nKey){
+    char sKey[50];
+    Flush_inp;
+    sprintf( sKey, "xdotool key --delay 1 --repeat 1 shift+%c", nKey);
+    system( sKey );
+}
+
+void Key_put_alt(unsigned int nKey){
+    char sKey[50];
+    Flush_inp;
+    sprintf( sKey, "xdotool key --delay 1 --repeat 1 alt+%c", nKey);
+    system( sKey );
+}
+
+void Put_kbd_text(const char* cKey){
+    char sKey[1024];
+
+    Flush_inp;
+    sprintf( sKey, "xdotool type --delay 1 --clearmodifiers \"%s\"",cKey);
+    system( sKey );
+    TYPED_STRING=1;
+}
+
+char * Read_typed_string()
+{
+   Str_init( read );
+   
+   if( TYPED_STRING ){
+      read = Space(1024);
+   
+      int i=0;
+      while ( !feof(stdin) ){
+         read[i++] = getc(stdin);
+      }
+      if ( Is_neg(read[i-1]) ) read[i-1]='\0';
+   }
+   return read;
 }
 
