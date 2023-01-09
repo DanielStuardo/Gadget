@@ -42,9 +42,17 @@ if [ -f "gadget_mouse.o" ]; then
 fi
 }
 
-function check_dependences(){
+function check_dependences_GPM(){
 GPM_MOUSE=`dpkg -l | grep -i libgpm`
 if [ "$GPM_MOUSE" != "" ]; then
+    return 0;
+fi
+return 1;
+}
+
+function check_dependences_XDOTOOL(){
+GPM_XDOTOOL=`dpkg -l | grep -i xdotool`
+if [ "$GPM_XDOTOOL" != "" ]; then
     return 0;
 fi
 return 1;
@@ -53,7 +61,7 @@ return 1;
 # verificar que existe el directorio "gadget": sino, se crea
 Clear_objects
 
-check_dependences
+check_dependences_GPM
 
 if [ "$?" != 0 ]; then
    echo "La librería GPM (General Purpose Mouse) no está instalada."
@@ -66,6 +74,19 @@ if [ "$?" != 0 ]; then
    echo "Generación terminada con fallo."
    exit 1
 fi
+
+check_dependences_XDOTOOL
+
+if [ "$?" != 0 ]; then
+   echo "XDOTOOL (para simular input de teclado y mouse) no está instalada."
+   echo "Instale el programa antes de continuar con la instalación de GADGET:"
+   echo " "
+   echo "       sudo apt install xdotool"
+   echo " "
+   echo "Generación terminada con fallo."
+   exit 1
+fi
+
 
          # acceder como #include <gadget/gadget.h>
          if [ ! -d "/usr/include/gadget" ]; then
