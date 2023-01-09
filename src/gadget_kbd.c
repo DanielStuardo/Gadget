@@ -27,6 +27,7 @@ extern int SCREEN_ROW;
 extern int SCREEN_COL;
 extern int Is_ok;
 extern int TYPED_STRING;
+extern int LEN_TYPED_STRING;
 
 
 /* HABILITACION DE RAW-MODE Y FUNCIONES AD-HOC */
@@ -437,11 +438,25 @@ void Key_put_alt(unsigned int nKey){
 
 void Put_kbd_text(const char* cKey){
     char sKey[1024];
-
+    LEN_TYPED_STRING = strlen(cKey);
     Flush_inp;
     sprintf( sKey, "xdotool type --delay 1 --clearmodifiers \"%s\"",cKey);
     system( sKey );
     TYPED_STRING=1;
+}
+
+char* Get_char_stdin()
+{
+    int i=0;
+    Str_init(c);c=Space(10);
+    c[i] = getc(stdin);
+    while ( Is_neg(c[i++]) && LEN_TYPED_STRING ) { 
+        c[i] = getc(stdin);
+        if ( Is_pos( c[i] ) ) { ungetc(c[i], stdin); break; }
+        else --LEN_TYPED_STRING; 
+    }
+    c[i]='\0';
+    return c;
 }
 
 char * Read_typed_string()
@@ -449,13 +464,16 @@ char * Read_typed_string()
    Str_init( read );
    
    if( TYPED_STRING ){
-      read = Space(1024);
+      read = Space(LEN_TYPED_STRING + 1);
    
       int i=0;
-      while ( !feof(stdin) ){
+      while ( LEN_TYPED_STRING && !feof(stdin) ){
          read[i++] = getc(stdin);
+         --LEN_TYPED_STRING;
       }
       if ( Is_neg(read[i-1]) ) read[i-1]='\0';
+      LEN_TYPED_STRING=0;
+      TYPED_STRING=0;
    }
    return read;
 }
