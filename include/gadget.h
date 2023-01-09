@@ -641,6 +641,7 @@ do{\
         int DECIMAL_POINT=46;\
         int MAX_LENGTH_READ=512;\
         int TYPED_STRING=0;\
+        int LEN_TYPED_STRING=0;\
         int SEPARATOR_MILLARS=44;\
         int PILA_GADGET=0,CONTADOR_PILA=-1;\
         int SCREEN_ROW=1, SCREEN_COL=1;\
@@ -2846,7 +2847,9 @@ F_STAT Stat_file( const char * );
                             KEYBOARD Y TERMIOS 
                    
  ***************************************************************************/
- 
+
+// define macro para detectar CTRL+<KEY>. CtrlKey('h') => ctrl+h
+#define  Ctrl_key(k)        ((k) & 0x1f)
 #define Flush_out     fflush(stdout);
 #define Flush_inp     fflush(stdin);while( Kbhit() ) Getch();
 
@@ -2914,6 +2917,10 @@ void Key_put_alt(unsigned int nKey);
 
 /* pone un texto en el buffer del teclado STDIN */
 void Put_kbd_text(const char* cKey);
+
+/* recibe un string-char desde stdin cuando se usa Put_kbd_text() */
+char* Get_char_stdin();
+
 /* lee el texto puesto en el STDIN */
 char * Read_typed_string();
 
@@ -3812,7 +3819,7 @@ char * Read_typed_string();
 #define   Is_non_zero(_X_)     ( ( _X_ ) != 0 )
 #define   Is_between(_V_,_X_,_Y_)   ( (_V_) >= (_X_) && (_V_) <= (_Y_) )
 
-#define   Not(_X_)           _X_ = !_X_
+#define   Not(_X_)           _X_ = _X_ ? 0 : 1;
 #define   Max(_X_,_Y_)   ((_X_) < (_Y_) ? (_Y_) : (_X_))
 #define   Min(_X_,_Y_)   ((_X_) > (_Y_) ? (_Y_) : (_X_))
 
@@ -3951,8 +3958,7 @@ void push_stack_str(const char * cString);
  *
  ************************************************************************/
 
-// define macro para detectar CTRL+<KEY>. CtrlKey('h') => ctrl+h
-#define  Ctrl_key(k)        ((k) & 0x1f)
+
 #define  Prnl              putchar('\n');
 #define  Flush_key         char r; while( (r = getchar()) != '\n') ;
 #define  FlushOut          fflush(stdout);
