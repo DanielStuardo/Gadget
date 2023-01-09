@@ -1140,11 +1140,11 @@ char ** GET_CALENDAR( DS_ARRAY * cal_data, int nCode, ... ){
    static char *_SMONTH_GR_[12] = {"JAN","FEB","MäR","APR","MAI","JUN","JUL","AUG","SEP",
                    "OKT","NOV","DEZ"};
                    
-   static char *_DAYNAMES_CL_[8] = {"Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"};
-   static char *_DAYNAMES_GR_[8] = {"Son", "Mon", "Die", "Mit", "Don", "Fre", "Sam", "Son"};
-   static char *_DAYNAMES_EN_[8] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
-   static char *_DAYNAMES_FR_[8] = {"Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"};
-   static char *_DAYNAMES_IT_[8] = {"Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"};
+   static char *_DAYNAMES_CL_[8] = {"Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do"};
+   static char *_DAYNAMES_GR_[8] = {"So", "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"};
+   static char *_DAYNAMES_EN_[8] = {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"};
+   static char *_DAYNAMES_FR_[8] = {"Di", "Lu", "Ma", "Me", "Je", "Ve", "Sa", "Di"};
+   static char *_DAYNAMES_IT_[8] = {"Do", "Lu", "Ma", "Me", "Gi", "Ve", "Sa", "Do"};
 
    int day, day_1, numdays, i, j;
    int mo; int yr;

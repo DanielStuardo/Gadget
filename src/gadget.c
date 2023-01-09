@@ -1099,6 +1099,15 @@ char * __Alltrim__( const char *sbuffer) {
    return buffer;
 }
 
+/* Capitalize */
+char * Capital( const char* sBuffer ){
+    char * buffer = pop_stack_if_null_noLen(sBuffer, "Capital","target");
+    if ( buffer == NULL ) return NULL;
+
+    buffer[0] = toupper(buffer[0]);
+    Item_return_release( buffer );
+}
+
 /* PAD */
 char * __Pad__( char * sbuffer, char cPad, int nLen, int tCompare ){
 
