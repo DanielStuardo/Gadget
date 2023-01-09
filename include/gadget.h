@@ -872,6 +872,10 @@ char * __Rtrim__(const char *linea);
 char * __Ltrim__(const char *linea);
 char * __Alltrim__( const char *linea);
 
+
+/* Capitalize an string */
+char * Capital( const char* sBuffer );
+
 /* PAD 
    tCompare es un valor entre 0 y 2 que indica orientación del relleno:
    char * v = Pad( v, ' ', 100, 0 )
