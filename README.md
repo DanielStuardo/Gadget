@@ -1,6 +1,7 @@
 # Gadget
 
 [ "C" like BASIC... but "C" ]
+
 BASIC multipurpose library, programmed in ANSI C, for handling strings, nested strings, multidimensional and multitype arrays, video and mouse use in Linux terminal; handling date and time, controls tabs, menu, select list, radio buttoms, buttoms and user define controls; access to keyboard (kbhit() and friends), and some utility functions to convert numbers to strings and vice versa, and other things (e.g. simulated input with xdotool).
 
 This library is a collection of functions and macros created by the author, and collected on the Internet since time immemorial. For the latter, if you see your code and do not have the credit that corresponds to it, write to me at the email below.
