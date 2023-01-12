@@ -35,7 +35,7 @@ extern int PILA_GADGET;
 extern int CONTADOR_PILA;
 extern char ** pila_de_trabajo;
 
-
+extern int Is_ok;
 
 /************************************************************************
  *
@@ -659,6 +659,7 @@ char * Parser( const char* cNameBuff, const char* cAttribsBuff, const char* cCon
       if (cTemp==NULL){
           free(cName);free(cAttribs);free(cContent);
           Msg_red("No hay memoria para 'Parser'\n");
+          Is_ok=0;
           return NULL;
       }
       memset(cTemp,0,nLenAttr + nLenName + nLenName + nLen + 50);  // relleno con 0.
@@ -721,6 +722,7 @@ ST_GETTAG Unparser( char **cVarStr, char* cName ){
       memcpy(cField + 1,cName,nLenName);
       memcpy(cField + 1 + nLenName,">",1);
       cField[nLenName + 2]='\0';       // "<field>"
+      ///printf("FIELD : [%s]\n", cField);
       int es_vacio=0;
       int tieneAtrib=0;
       char* iniF = strstr(*cVarStr,cField);  // primera ocurrencia del campo
@@ -743,15 +745,18 @@ ST_GETTAG Unparser( char **cVarStr, char* cName ){
       if (iniF==NULL)
       {  // no lo encontró. Puede ser un campo solitario.
          cField[nLenName + 1]='/';cField[nLenName + 2]='>';cField[nLenName + 3]='\0';  // "<field/>"
+         //printf("FIELD2 : [%s]\nTEXT : \n%s\n", cField, *cVarStr);
          iniF = strstr(*cVarStr,cField);   // busco otra vez.
          if(iniF==NULL)
          {  // no lo encontró. Podría ser un tag con atributos...
             cField[nLenName + 1]=' ';cField[nLenName + 2]='\0';  // "<field "
+            //printf("FIELD3 : [%s]\n", cField);
             iniF = strstr(*cVarStr,cField);   // busco otra vez.
             if(iniF==NULL)
             {
                sw=0;
                Msg_amberf("Unparser : no se ha encontrado el campo indicado: '%s'\n",cName);
+               Is_ok=0;
             }
             else
             {  // tiene atributos
