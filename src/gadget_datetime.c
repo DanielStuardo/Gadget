@@ -677,7 +677,7 @@ int Day_of_week( const char * cDateFBuff ){
 int hb_timeValid( const char * szTimeBuff, long nLen, int * piDecode )
 {
    char * szTime = pop_stack_if_null_noLen(szTimeBuff, "Is_time_valid","time-string");
-   if (szTime==NULL) { return -1;}
+   if (szTime==NULL) { return 0;}
 
    int fValid = X_FALSE;
 
@@ -709,7 +709,7 @@ int hb_timeValid( const char * szTimeBuff, long nLen, int * piDecode )
 int hb_dateValid( const char * cDateBuff, long nLen ){
 
    char * cDate = pop_stack_if_null_noLen(cDateBuff, "Is_date_valid","date-string");
-   if (cDate==NULL) { return -1;}
+   if (cDate==NULL) { return 0;}
 
    int fecha_correcta = 0;
    int dia_maximo=0;

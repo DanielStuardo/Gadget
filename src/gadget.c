@@ -132,6 +132,7 @@ char * Get_token( char * cTXTBuff, int nToken ){
       char * ret = NULL;
       if( !token ){
          Msg_yellow("Get_token: error interno (strtok) - fin prematuro de busqueda\n");
+         Is_ok=0;
       }else{
          if( nToken > 1 ){
             while( token ){
@@ -141,13 +142,16 @@ char * Get_token( char * cTXTBuff, int nToken ){
             }
          }
       }
-      ret = (char *)calloc( strlen(token) + 1, 1 );
-      strcpy(ret,token);
+      if( Is_ok ){
+         ret = (char *)calloc( strlen(token) + 1, 1 );
+         strcpy(ret,token);
+      }
       free(cTexto);
       free(cTXT);
+      
       if(PILA_GADGET){
           push_stack_str(ret);
-          free(ret);
+          Free_secure(ret);
           return NULL;
       }
 return ( ret );
