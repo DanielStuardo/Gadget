@@ -15,6 +15,10 @@
 
 #endif*/
 
+extern int PILA_GADGET;
+extern int CONTADOR_PILA;
+extern char ** pila_de_trabajo;
+
 //#include <gadget/gadget_kbd.h>
 
 /* PARA KBHIT() Y FUNCIONES DE TECLADO */
@@ -228,6 +232,7 @@ char * Input( char * cText, int nSpace ){
    int /*lBuffer = 0,*/ ipos=0, swSigue=1;
 
    New_str_array(cBuffer);
+   
    if(cText!=NULL){
       cBuffer = Split_char( cText, pSDS(cBuffer));
       while( nSpace < Len(cBuffer) ){
@@ -398,7 +403,9 @@ char * Input( char * cText, int nSpace ){
        Cat(retVal,Cell(cBuffer,i));
    }
    sFree_array(cBuffer);
-   return retVal;
+   Item_return_release(retVal);
+   
+   ///return retVal;
 }
 
 /*
