@@ -662,15 +662,15 @@ do{\
             Init_stack;
 
 /* OBTIENE ARGUMENTOS DESDE EL COMMAND LINE */
-#define Get_arg_str(_X_,_N_)   Str_init(_X_); if( argc > _N_ ) { Let(_X_,argv[_N_]) } else{\
+#define Get_arg_str(_X_,_N_)   Str_init(_X_); if( argc > (_N_) ) { Let(_X_,argv[(_N_)]) } else{\
                                Msg_red("Get_arg_str : no se ha recibido el argumento esperado para <"#_X_">"); Stop(1);}
-#define Get_arg_int(_X_,_N_)   int _X_; if( argc > _N_ ) { _X_ = Str2int(argv[_N_]); } else{\
+#define Get_arg_int(_X_,_N_)   int _X_; if( argc > (_N_) ) { _X_ = Str2int(argv[(_N_)]); } else{\
                                Msg_red("Get_arg_int : no se ha recibido el argumento esperado para <"#_X_">"); Stop(1);}
-#define Get_arg_long(_X_,_N_)   long _X_; if( argc > _N_ ) { _X_ = Str2lng(argv[_N_]); } else{\
+#define Get_arg_long(_X_,_N_)   long _X_; if( argc > (_N_) ) { _X_ = Str2lng(argv[(_N_)]); } else{\
                                 Msg_red("Get_arg_int : no se ha recibido el argumento esperado para <"#_X_">"); Stop(1);}
-#define Get_arg_float(_X_,_N_)    float _X_; if( argc > _N_ ) { _X_ = Str2flt(argv[_N_]); } else{\
+#define Get_arg_float(_X_,_N_)    float _X_; if( argc > (_N_) ) { _X_ = Str2flt(argv[(_N_)]); } else{\
                                   Msg_red("Get_arg_float : no se ha recibido el argumento esperado para <"#_X_">"); Stop(1);}
-#define Get_arg_double(_X_,_N_)   double _X_; if( argc > _N_ ) { _X_ = Str2dbl(argv[_N_]); } else{\
+#define Get_arg_double(_X_,_N_)   double _X_; if( argc > (_N_) ) { _X_ = Str2dbl(argv[(_N_)]); } else{\
                                   Msg_red("Get_arg_double : no se ha recibido el argumento esperado para <"#_X_">"); Stop(1);}
 
 #define Arg_count            argc
