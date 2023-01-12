@@ -550,6 +550,7 @@ do{\
               }while(0);
                                      
 /* ASIGNAR/CONCATENAR EL RESULTADO DE UNA FUNCION STRING A UNA VARIABLE */
+#define   Fn_cat( _X_, _Y_ )    Get_fn_cat( _X_, _Y_ )
 #define   Get_fn_cat( _X_, _Y_ ) \
                do{\
                    char * __tmp__=NULL;\
@@ -557,6 +558,7 @@ do{\
                    if(__tmp__){ Cat( _X_, __tmp__ ); free(__tmp__);}\
                }while(0);
 
+#define   Fn_let(_X_,_Y_)   Get_fn_let( _X_, _Y_ )
 #define   Get_fn_let( _X_, _Y_ ) \
                do{\
                    char * __tmp__=NULL;\
