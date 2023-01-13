@@ -14,9 +14,6 @@ void write_human_date( const char* date, const char * time )
                                     Get_hour(time)>=12 ? "pm" : "am" ;
 }
 
-/*int sign( int n ){
-   return n<0? -1 : 1;
-}*/
 
 Main
    Assert( Arg_count==2, fail_input );
@@ -36,12 +33,12 @@ Main
        /////addhour *= sign;
    }else if( Occurs(",", cTime) ){  // horas>24 , minutos [0->59]
        long min=0;
-       String cmin;
+       //String cmin;
        Stack{
            addhour = Str2int( Get_token(cTime,1) );
-           min = Time2sec( Multi_copy( cmin, "00:", Get_token(cTime,2),NULL) );
+           min = Time2sec( Multi_copy( NULL, "00:", Get_token(cTime,2),NULL) );
        }Stack_off;
-       Free secure cmin;
+       //Free secure cmin;
       // Print "H=%d, M=%ld\n", addhour*60*60, min;
        //int sign = 1;
        if( addhour<0 ) {
