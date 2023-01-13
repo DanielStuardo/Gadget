@@ -389,9 +389,10 @@ typedef struct __video_mem__{
 
 
 #define  Set(_X_,_Y_)       \
+                        char * _X_=NULL;\
                         do{\
                             int len = strlen(_Y_);\
-                            char *_X_ = (char*)calloc( len + 1, 1);\
+                            _X_ = (char*)calloc( len + 1, 1);\
                             if(_X_) { memcpy(_X_, _Y_, len); }\
                             else { perror("\033[38;5;196mSet: No hay memoria para <"#_X_">(CALLOC)\n\033[0m"); }\
                         }while(0);
