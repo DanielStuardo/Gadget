@@ -35,12 +35,18 @@ char * pop_stack_if_null_noLen(const char *cBuffer, const char *msg,
                          const char *sub_msg){
    char * retValue=NULL;
    if( cBuffer ){
-       retValue = (char *)calloc( strlen(cBuffer)+1,1);
-       strcpy( retValue, cBuffer );
+       int len = strlen(cBuffer);
+       retValue = (char *)calloc( len+1,1);
+       memcpy( retValue, cBuffer, len );
+       //retValue = (char *)calloc( strlen(cBuffer)+1,1);
+       //strcpy( retValue, cBuffer );
    }else{
        if(CONTADOR_PILA>=0){
-          retValue = (char *)calloc( strlen( pila_de_trabajo[CONTADOR_PILA])+1,1);
-          strcpy( retValue, pila_de_trabajo[CONTADOR_PILA] );
+          int len = strlen( pila_de_trabajo[CONTADOR_PILA]);
+          retValue = (char *)calloc( len+1,1);
+          memcpy( retValue, pila_de_trabajo[CONTADOR_PILA], len );
+          //retValue = (char *)calloc( strlen( pila_de_trabajo[CONTADOR_PILA])+1,1);
+          //strcpy( retValue, pila_de_trabajo[CONTADOR_PILA] );
           CONTADOR_PILA--;
        }else{
           if( msg ) {Msg_redf("%s : argumento NULL no esperado '%s'\n",msg,sub_msg);}
@@ -71,12 +77,14 @@ char * pop_stack_if_null(const char *cBuffer, long * Len, const char *msg,
    if( cBuffer ){
        *Len = strlen(cBuffer);
        retValue = (char *)calloc( *Len+1,1);
-       strcpy( retValue, cBuffer );
+       //strcpy( retValue, cBuffer );
+       memcpy( retValue, cBuffer, *Len );
    }else{
        if(CONTADOR_PILA>=0){
           *Len = strlen( pila_de_trabajo[CONTADOR_PILA] );
           retValue = (char *)calloc( *Len+1,1);
-          strcpy( retValue, pila_de_trabajo[CONTADOR_PILA] );
+          //strcpy( retValue, pila_de_trabajo[CONTADOR_PILA] );
+          memcpy( retValue, pila_de_trabajo[CONTADOR_PILA], *Len );
           CONTADOR_PILA--;
        }else{
           if( msg ) {Msg_redf("%s : argumento NULL no esperado '%s'\n",msg,sub_msg);}
@@ -89,8 +97,10 @@ char * pop_stack_if_null(const char *cBuffer, long * Len, const char *msg,
 char * pop_stack_hard(const char *msg, const char *sub_msg){
    char * line=NULL;
    if(CONTADOR_PILA>=0){
-       line = (char *)calloc( strlen( pila_de_trabajo[CONTADOR_PILA] )+1,1);
-       strcpy( line, pila_de_trabajo[CONTADOR_PILA] );
+       int len = strlen( pila_de_trabajo[CONTADOR_PILA] );
+       line = (char *)calloc( len+1,1);
+       //strcpy( line, pila_de_trabajo[CONTADOR_PILA] );
+       memcpy( line, pila_de_trabajo[CONTADOR_PILA], len );
        CONTADOR_PILA--;
        return line;
    }else{
@@ -106,7 +116,10 @@ void malloc_stack_str(int nLen){
 
 void push_stack_str(const char * cString){
    if( pila_de_trabajo[++CONTADOR_PILA]) free(pila_de_trabajo[CONTADOR_PILA]);
-   pila_de_trabajo[CONTADOR_PILA] = calloc( strlen(cString)+1, 1 );
-   strcpy( pila_de_trabajo[CONTADOR_PILA], (const char *)cString );
+   int len = strlen(cString);
+   pila_de_trabajo[CONTADOR_PILA] = calloc( len+1, 1 );
+   memcpy( pila_de_trabajo[CONTADOR_PILA], (const char *)cString, len );
+   //pila_de_trabajo[CONTADOR_PILA] = calloc( strlen(cString)+1, 1 );
+   //strcpy( pila_de_trabajo[CONTADOR_PILA], (const char *)cString );
 }
 

@@ -569,7 +569,9 @@ char * Elaptime( const char * cStartBuff, const char * cEndBuff ){
    long lEnd =   Time2sec( cEnd );
    char * szTime=NULL;
    szTime = Sec2time( ( lEnd < lStart ? 86400 : 0 ) + lEnd - lStart );
-   
+   if ( szTime == NULL )
+       szTime = pop_stack_hard("Elaptime","stack");
+
    free(cStart);free(cEnd);
    if(PILA_GADGET){
       push_stack_str(szTime); free(szTime); return NULL;
@@ -1036,7 +1038,12 @@ char * Date_format( char * cDateBuff, int formato){
    
    char *subfecha = Space(12);
    char *formato_actual = Get_date_format(ACTUAL_DATE_FORMAT);
+   if(formato_actual==NULL)
+       formato_actual = pop_stack_hard("Date_format","stack");
    char *nuevo_formato = Get_date_format(formato);
+   if(nuevo_formato==NULL)
+       nuevo_formato = pop_stack_hard("Date_format","stack");
+
    long lStart = x_dateUnformat( cDate, formato_actual );
    char szDate[ 9 ];
    char * retVal =  x_dateFormat( x_dateDecStr( szDate, lStart ),
@@ -1045,6 +1052,138 @@ char * Date_format( char * cDateBuff, int formato){
    free(formato_actual); free( nuevo_formato );
    free(cDate);
    Item_return_release(retVal);
+}
+
+/* añade horas y minutos a una hora */
+char* Add_time( char *timeBuff, int addhour, int min )
+{
+    char * time = pop_stack_if_null_noLen(timeBuff, "Add_time","time-string");
+    if (time==NULL) { return NULL;}
+    
+    Str_init(ctemp) ; Str_init( cmin );
+    
+    Get_fn_or_stack(cmin, Int2str(min), "Add_time","stack");
+   /* cmin = Int2str(min);
+    if ( cmin == NULL ){ // por si Add_time es usada dentro de stack.
+        cmin = pop_stack_hard("Add_time","stack");
+    }*/
+    Get_fn_or_stack(ctemp, Multi_copy( ctemp, "00:",cmin ,NULL), "Add_time","stack");
+    /*ctemp = Multi_copy( ctemp, "00:",cmin ,NULL) ;
+    if ( ctemp == NULL ){
+        ctemp = pop_stack_hard("Add_time","stack");
+    }*/
+    ///printf( "CTEMP = %s\n", ctemp);
+    min = Time2sec( ctemp );
+    Free_secure(cmin); Free_secure(ctemp);
+    
+    if( addhour<0 ) {
+        addhour = addhour*3600 - min;
+    }else{
+        addhour = addhour*3600 + min;
+    }
+    int SGN = Sign(addhour);
+    int ts = Time2sec(time);
+    if( Is_non_neg(addhour) ){
+        Free_secure(time);
+        Get_fn_or_stack( time, Sec2time( ( ts + addhour )), "Add_time","stack");
+        /*time = Sec2time( ( ts + addhour ));
+        if ( time == NULL )
+            time = pop_stack_hard("Add_time","stack"); */
+        ///Get_fn_let( time, Sec2time( ( ts + addhour )) );
+    }else{
+        int actual_hour = Get_hour(time);
+        Free_secure(time);
+        int subdays = ( ts + SGN*addhour ) / 86400;
+        if( SGN*addhour > ts ){
+            Get_fn_or_stack( time, Sec2time( 86400*subdays - SGN * (ts + addhour )), "Add_time","stack");
+            /*time = Sec2time( 86400*subdays - SGN * (ts + addhour ));
+            if ( time == NULL )
+                time = pop_stack_hard("Add_time","stack");*/
+        }else{
+            if( SGN*addhour/3600 <= actual_hour && Is_non_zero(subdays) ) 
+                 subdays--;
+            Get_fn_or_stack( time, Sec2time( ts + addhour ), "Add_time","stack");
+           /* time = Sec2time( ts + addhour );
+            if ( time == NULL )
+                time = pop_stack_hard("Add_time","stack");*/
+        }
+    }
+    Item_return_release(time);
+}
+
+/* Añade horas y minutos a una hora, alterando la fecha de acuerdo al resultado.
+   No debe trabajar  */
+void Add_time2date( char* dateBuff, char* timeBuff, int addhour, int min )
+{
+    char * date = pop_stack_if_null_noLen(dateBuff, "Add_time2date","date-string");
+    Assert( date, fail_date );
+
+    char * time = pop_stack_if_null_noLen(timeBuff, "Add_time2date","time-string");
+    Assert( time, fail_time );
+    
+    Str_init(ctemp) ; Str_init( cmin );
+    Get_fn_or_stack(cmin, Int2str(min), "Add_time2date","stack");
+    Get_fn_or_stack(ctemp, Multi_copy( ctemp, "00:",cmin ,NULL), "Add_time2date","stack");
+
+    min = Time2sec( ctemp );
+    Free_secure(cmin); Free_secure(ctemp);
+    
+    if( addhour<0 ) {
+        addhour = addhour*3600 - min;
+    }else{
+        addhour = addhour*3600 + min;
+    }
+    int SGN = Sign(addhour);
+    int ts = Time2sec(time);
+    if( Is_non_neg(addhour) ){
+        int adddays = ( ts + addhour ) / 86400;
+        Free_secure(time);
+        Get_fn_or_stack( time, Sec2time( ts + addhour ), "Add_time2date","stack");
+
+        Set( cdate, date);
+        Free_secure(date);
+        Get_fn_or_stack( date, Date_add( cdate, adddays ), "Add_time2date","stack"); 
+
+        Free_secure(cdate);
+    }else{
+        
+        int subdays = ( ts + SGN*addhour ) / 86400;
+        if( SGN*addhour > ts ){
+            Free_secure(time);
+            Get_fn_or_stack( time, Sec2time( 86400*subdays - SGN * (ts + addhour )),"Add_time2date","stack");
+
+        }else{
+            
+            if( SGN*addhour/3600 <= Get_hour(time) && Is_non_zero(subdays) ) 
+                subdays--;
+            Free_secure(time);
+            Get_fn_or_stack( time, Sec2time( ts + addhour ), "Add_time2date","stack");
+
+        }
+        Set( cdate, date);
+        Free_secure(date);
+        Get_fn_or_stack( date, Date_add( cdate, SGN*subdays ), "Add_time2date","stack");
+
+        Free_secure(cdate);
+    }
+    //if( PILA_GADGET ) {
+    // Fuerza datos en la pila, aunque no esté activa.
+    // se debe activar el Stack para recupear los datos.
+        push_stack_str( time );
+        push_stack_str( date );
+        Free_secure(date); Free_secure(time);
+    //}
+    Exception ( fail_date ){
+        Msg_red("Add_time2date: Argument 'date' invalid\n");
+        push_stack_str( "***" );
+        push_stack_str( "***" );
+    }
+    Exception ( fail_time ){
+        Msg_red("Add_time2date: Argument 'time' invalid\n");
+        push_stack_str( "***" );
+        push_stack_str( "***" );
+        Free_secure(date);
+    }
 }
 
 /* CALENDAR */
