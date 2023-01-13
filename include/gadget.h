@@ -297,16 +297,24 @@ typedef struct __video_mem__{
    }else{ Msg_amber("Store: No hay datos en la pila");}\
  }while(0);
 
+/* retornará el resultado normalmente si no está en stack; pero si está en él,
+   retornará NULL y dejará en el stack el resultado, para luego liberarlo. */
 #define  Item_return_release(_X_) \
    if(PILA_GADGET){\
    push_stack_str(_X_);free(_X_);return NULL;\
    } return _X_;
-   
+
+/* para ua función string, dejará un resultado en el stack si está dentro de él,
+   pero no liberará la memoria; si está fuera del stack, retornará el resultado
+   normalmente */
 #define  Item_return(_X_) \
    if(PILA_GADGET){\
    push_stack_str(_X_);return NULL;\
    } return _X_;
 
+/* Funcion muy IMPORTANTE, porque supone el uso de otras funciones tributarias
+   que también hacen uso del stack, las cuales, cuando están en stack, dejan
+   sus resutados en él y retornan NULL */
 #define  Get_fn_or_stack(_X_,_Y_,_MSG_,_SUBMSG_)  \
      _X_ = _Y_;\
      if( _X_==NULL){\
@@ -368,17 +376,25 @@ typedef struct __video_mem__{
 
 #define  Free_secure(_X_)    if(_X_) { free(_X_); _X_=NULL; }
 
-#define  Let(_X_,_Y_)       if(_X_) free(_X_);\
-                            _X_ = (char*)calloc( strlen(_Y_) + 1, 1);\
-                            if(_X_) { strcpy(_X_, _Y_); }\
-                            else { perror("\033[38;5;196mLet: No hay memoria para <"#_X_">(CALLOC)\n\033[0m"); }
+#define  Let(_X_,_Y_)       \
+                        do{\
+                            if(_X_) free(_X_);\
+                            int len = strlen(_Y_);\
+                            _X_ = (char*)calloc( len + 1, 1);\
+                            if(_X_) { memcpy(_X_, _Y_, len); }\
+                            else { perror("\033[38;5;196mLet: No hay memoria para <"#_X_">(CALLOC)\n\033[0m"); }\
+                        }while(0);
 
 #define  Copy(_X_,_Y_)      Let(_X_,_Y_)
 
 
-#define  Set(_X_,_Y_)       char *_X_ = (char*)calloc( strlen(_Y_) + 1, 1);\
-                            if(_X_) { strcpy(_X_, _Y_); }\
-                            else { perror("\033[38;5;196mSet: No hay memoria para <"#_X_">(CALLOC)\n\033[0m"); }
+#define  Set(_X_,_Y_)       \
+                        do{\
+                            int len = strlen(_Y_);\
+                            char *_X_ = (char*)calloc( len + 1, 1);\
+                            if(_X_) { memcpy(_X_, _Y_, len); }\
+                            else { perror("\033[38;5;196mSet: No hay memoria para <"#_X_">(CALLOC)\n\033[0m"); }\
+                        }while(0);
 
 #define  Cat(_X_,_Y_)       _X_ = (char*)realloc( (void *)_X_,strlen(_X_) + strlen(_Y_) + 1);\
                             if(_X_) { strcat(_X_, _Y_); }\
@@ -2800,6 +2816,12 @@ char * x_dateDecStr( char * szDate, long lJulian );
 char * Date_add( const char * cDate, long lEnd );
 long Days_diff( const char * cDate1, const char * cDate2 );
 
+
+/* añade horas y minutos a una hora */
+char* Add_time( char *timeBuff, int addhour, int min );
+/* Añade horas y minutos a una hora, alterando la fecha de acuerdo al resultado.
+   No debe trabajar  */
+void Add_time2date( char* dateBuff, char* timeBuff, int addhour, int min );
 /* 0=domingo, 1=lunes,..., 7=domingo */
 char * Get_dayname(int nDay);
 
@@ -3820,6 +3842,7 @@ char * Read_typed_string();
 #define   Is_non_pos(_X_)     ( ( _X_ ) <= 0 )
 #define   Is_non_zero(_X_)     ( ( _X_ ) != 0 )
 #define   Is_between(_V_,_X_,_Y_)   ( (_V_) >= (_X_) && (_V_) <= (_Y_) )
+#define   Sign(_N_)  ( (_N_)<0? -1 : 1 )
 
 #define   Not(_X_)           _X_ = _X_ ? 0 : 1;
 #define   Max(_X_,_Y_)   ((_X_) < (_Y_) ? (_Y_) : (_X_))
@@ -3945,6 +3968,7 @@ char * pop_stack_if_null_noLen(const char *cBuffer, const char *msg,
 size_t pop_stack_len(const char * cBuffer, const char *msg, const char *sub_msg);
 
 /* saca un string desde el stack */
+#define Pop_stack(_X_)     Fn_let( _X_, pop_stack_hard("stack", "stack") )
 char * pop_stack_hard(const char *msg, const char *sub_msg);
 
 /* crea espacio en el stack para trabajar sobre él */
