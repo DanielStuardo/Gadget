@@ -1683,7 +1683,7 @@ void print_dots( int colorF, int colorB )
    //Reshape( dots, rx*cx);
    //Color(colorF, colorB);
    //char *points = Space(25000);
-   static char points[100000];
+   static char points[300000];
    
    Iterator up i [0:1:101]{
       Iterator up j [0:1:76]{
