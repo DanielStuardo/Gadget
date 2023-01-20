@@ -948,15 +948,29 @@ int Get_month( const char *cDateFBuff ){
    return iMonth;
 }
 
-int Timer( float * nVarTimer, float nTimeMillisec ){   // trabaja con clock().
+int Timer( unsigned long * nVarTimer, unsigned long nTimeMillisec ){   // trabaja con clock().
+  clock_t tiempo = clock();
 
-  if( ( clock() - * nVarTimer ) * 1000 / CLOCKS_PER_SEC >= nTimeMillisec ){
-      * nVarTimer = clock();
+  if( ( tiempo - * nVarTimer ) * 1000 / CLOCKS_PER_SEC >= nTimeMillisec ){
+      * nVarTimer = tiempo;
       return 1;
    }else{
       return 0;
    }
 }
+
+unsigned long Tic(){
+   clock_t tiempo = clock();
+   return (unsigned long)tiempo;
+}
+unsigned long Toc(unsigned long nVarT1 ){
+
+   clock_t tiempo = clock();
+   return (unsigned long)(( tiempo - nVarT1 ) / CLOCKS_PER_SEC);
+}
+
+///#define   Tic(_X_)            _X_ = clock();
+///#define   Toc(_X_,_Y_)        _Y_ = ( clock() - (_X_) ) / CLOCKS_PER_SEC;
 
 void x_dateStrPut( char * szDate, int iYear, int iMonth, int iDay )
 {
