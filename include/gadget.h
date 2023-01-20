@@ -2717,8 +2717,8 @@ void Get_coor_4(long nPos, DS_ARRAY * mat_data, int *r, int *c, int *p, int *b )
 #define  YMD_2      8   // YYYY.MM.DD
 
 /* clock_t X, Y;  */
-#define  Tic(_X_)            _X_ = clock();
-#define  Toc(_X_,_Y_)        _Y_ = ( clock() - (_X_) ) / CLOCKS_PER_SEC;
+///#define  Tic(_X_)            _X_ = clock();
+///#define  Toc(_X_,_Y_)        _Y_ = ( clock() - (_X_) ) / CLOCKS_PER_SEC;
 #define  Is_leap_year(_X_)     ( _X_ % 4 == 0 && _X_ % 100 != 0 ) || ( _X_ % 400 == 0 )
 #define  Is_time_valid(_D_)    hb_timeValid( _D_, strlen(_D_), NULL )
 #define  Is_date_valid(_D_)    hb_dateValid( _D_, strlen(_D_))
@@ -2809,7 +2809,9 @@ int Get_millisecond( const char *sTime );
 int Get_year( const char *cDateF );
 int Get_day( const char *cDateF );
 int Get_month( const char *cDateF );
-int Timer( float * nVarTimer, float nTimeMillisec );
+int Timer( unsigned long * nVarTimer, unsigned long nTimeMillisec );
+unsigned long Tic();
+unsigned long Toc(unsigned long nVarT1 );
 
 void x_dateStrPut( char * szDate, int iYear, int iMonth, int iDay );
 
@@ -3887,8 +3889,8 @@ char * Read_typed_string();
 #define  Unset_binsize      SIZE_BINARY = 0;
 
 // medicion de tiempo
-#define   Tic(_X_)            _X_ = clock();
-#define   Toc(_X_,_Y_)        _Y_ = ( clock() - (_X_) ) / CLOCKS_PER_SEC;
+//#define   Tic(_X_)            _X_ = clock();
+//#define   Toc(_X_,_Y_)        _Y_ = ( clock() - (_X_) ) / CLOCKS_PER_SEC;
 
 // año bisiesto 
 #define   Is_leap_year(_X_)     ( _X_ % 4 == 0 && _X_ % 100 != 0 ) || ( _X_ % 400 == 0 )
