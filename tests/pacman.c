@@ -468,21 +468,21 @@ Main
                  if ( tdir == DIR_LEFT ){
                      --y;
                      if ( dots[x+1][y+1]!=1 ) ++y;
-                     else { dir = tdir; /*++y;*/ sw_predice=0; }
+                     else { dir = tdir; /*++y;*/olddir=0; sw_predice=0; }
                  }else if( tdir == DIR_DOWN ){
                      ++x;
                      if ( dots[x+1][y+1]!=1 ) --x;
-                     else { dir = tdir; /*--x;*/ sw_predice=0; }
+                     else { dir = tdir; /*--x;*/olddir=0; sw_predice=0; }
 
                  }else if( tdir == DIR_UP ){
                      --x;
                      if ( dots[x+1][y+1]!=1 ) ++x;
-                     else { dir = tdir; /*++x;*/ sw_predice=0; }
+                     else { dir = tdir; /*++x;*/olddir=0; sw_predice=0; }
 
                  }else if( tdir == DIR_RIGHT ){
                      ++y;
                      if ( dots[x+1][y+1]!=1 ) --y;
-                     else { dir = tdir; /*--y;*/ sw_predice=0; }
+                     else { dir = tdir; /*--y;*/olddir=0; sw_predice=0; }
 
                  }
              }
@@ -531,26 +531,32 @@ Main
              
              /* hay un desfase con el array de puntos, porque comienza en 0, y las
                 coordenadas del mono comienzan en 1 */
+             
+             
              if(dir==DIR_LEFT) {   //{ y-= y>3 ? 1 : 0; if( y==3 ) dir=tdir=0; }
                  --y;
-                 if ( dots[x+1][y+1]>2 && dots[x+1][y+1]!=20 && dots[x+1][y+1]!=30
-                                       && dots[x+1][y+1]!=100 ) {
-                      //if( olddir==DIR_LEFT ){
-                      ++y; dir=tdir=0; 
-                      if( sw_waka ){
-                         //kill_waka(&sw_waka,PIDWAKA);
-                         kill_sound( PIDWAKA );sw_waka=0;
-                         Free secure PIDWAKA;
-                         cnt_void_waka=0;
+                 int location = dots[x+1][y+1];
+                 if ( location>2 && location!=20 && location!=30
+                                       && location!=100 ) {
+                      if( location==3 && (olddir==DIR_UP || olddir==DIR_DOWN) ){
+                           ++y; dir=olddir; sw_predice=1;
+                      }else{
+                           ++y; dir=tdir=0; 
+                           if( sw_waka ){
+                              //kill_waka(&sw_waka,PIDWAKA);
+                              kill_sound( PIDWAKA );sw_waka=0;
+                              Free secure PIDWAKA;
+                              cnt_void_waka=0;
+                           }
                       }
                      /* }else{
                          ++y; dir=olddir; sw_predice=1;
                       }*/
                  }
-                 else if ( dots[x+1][y+1]==0 ) {
+                 else if ( location==0 ) {
                       ++y; dir=olddir; sw_predice=1;
                  }
-                 else if ( dots[x+1][y+1]==2 /* || $dots[x+1,y+1]==1*/ ) {
+                 else if ( location==2 /* || $dots[x+1,y+1]==1*/ ) {
                      score += 10;
                      ++cnt_dots;
                      dots[x+1][y+1]=1;
@@ -561,7 +567,7 @@ Main
                          sw_waka=1;
                      }
                      cnt_void_waka=0;
-                 }else if ( dots[x+1][y+1]==100 ){  // fruit!!
+                 }else if ( location==100 ){  // fruit!!
                         score += point_fruit[level_fruit];
                         system("aplay -q tests/dataPacman/pacman_eatfruit.wav </dev/null >/dev/null 2>&1 &");
                         quita_fruit();
@@ -596,7 +602,7 @@ Main
                          --y;
                      }
                      t=0; Tic(t);
-                 }else */if( dots[x+1][y+1] == 30 ){  // se va al otro lado
+                 }else */if( location == 30 ){  // se va al otro lado
                      y = 70;
                  }
                  /* verifica si ha comido todos los puntos para terminar la partida */
@@ -626,23 +632,27 @@ Main
              }
              else if(dir==DIR_DOWN) {//{ x += x<93 ? 1 : 0; if( x==93 ) dir=tdir=0;}
                  ++x;
-                 if ( dots[x+1][y+1]>2 && Is_not(dots[x+1][y+1],20, 30, 50,51,52,53) ) {
-                      //if(olddir==DIR_DOWN){
-                      --x; dir=tdir=0; 
-                      if( sw_waka ){
-                         //kill_waka(&sw_waka,PIDWAKA);
-                         kill_sound( PIDWAKA );sw_waka=0;
-                         Free secure PIDWAKA;
-                         cnt_void_waka=0;
+                 int location = dots[x+1][y+1];
+                 if ( location>2 && Is_not(location,20, 30, 50,51,52,53) ) {
+                      if( location==3 && (olddir==DIR_LEFT || olddir==DIR_RIGHT) ){
+                           --x; dir=olddir; sw_predice=1;
+                      }else{
+                           --x; dir=tdir=0; 
+                           if( sw_waka ){
+                                //kill_waka(&sw_waka,PIDWAKA);
+                                kill_sound( PIDWAKA );sw_waka=0;
+                                Free secure PIDWAKA;
+                                cnt_void_waka=0;
+                           }
                       }
                      /* }else{
                          --x; dir=olddir; sw_predice=1; 
                       }*/
                  }
-                 else if ( dots[x+1][y+1]==0 ) {
+                 else if ( location==0 ) {
                       --x; dir=olddir; sw_predice=1; 
                  }
-                 else if ( dots[x+1][y+1]==2/* || $dots[x+1,y+1]==1 */) {
+                 else if ( location==2/* || $dots[x+1,y+1]==1 */) {
                      score += 10;
                      ++cnt_dots;
                      dots[x+1][y+1]=1;
@@ -653,7 +663,7 @@ Main
                          sw_waka=1;
                      }
                      cnt_void_waka=0;
-                 }else if ( dots[x+1][y+1]>=50 && dots[x+1][y+1]<=53 ) { // power pills!
+                 }else if ( location>=50 && location<=53 ) { // power pills!
                      if(sw_waka){
                          //kill_waka(&sw_waka,PIDWAKA);
                          kill_sound( PIDWAKA );sw_waka=0;
@@ -672,10 +682,10 @@ Main
                      }
                      Fn_let( PIDPILLS, put_sound(SND_PILLS)); //pone_pills());
 
-                     status_pills[ dots[x+1][y+1]-50 ]=0;
+                     status_pills[ location-50 ]=0;
                      --cnt_status_pills;
                      dots[x+1][y+1]=1;
-                     score += 20;
+                     score += 50;
                      sw_time_scary=0;
                      ++cnt_dots;
                      pone_score(score, &sw_extra_life_active, &vidas, level_fruit);
@@ -727,23 +737,27 @@ Main
              }
              else if(dir==DIR_UP) {//{ x -= x>3 ? 1 : 0; if( x==3 ) dir=tdir=0;}
                  --x;
-                 if ( dots[x+1][y+1]>2 && Is_not(dots[x+1][y+1],20, 30, 50,51,52,53 ) ) {
-                      //if(olddir==DIR_UP){
-                      ++x; dir=tdir=0; 
-                      if( sw_waka ){
-                         //kill_waka(&sw_waka,PIDWAKA);
-                         kill_sound( PIDWAKA );sw_waka=0;
-                         Free secure PIDWAKA;
-                         cnt_void_waka=0;
+                 int location = dots[x+1][y+1];
+                 if ( location>2 && Is_not(location,20, 30, 50,51,52,53 ) ) {
+                      if( location==3 && (olddir==DIR_LEFT || olddir==DIR_RIGHT) ){
+                           ++x; dir=olddir; sw_predice=1;
+                      }else{
+                           ++x; dir=tdir=0; 
+                           if( sw_waka ){
+                               //kill_waka(&sw_waka,PIDWAKA);
+                               kill_sound( PIDWAKA );sw_waka=0;
+                               Free secure PIDWAKA;
+                               cnt_void_waka=0;
+                           }
                       }
                      /* }else{
                          ++x; dir=olddir; sw_predice=1; 
                       }*/
                  }
-                 else if ( dots[x+1][y+1]==0 ) {
+                 else if ( location==0 ) {
                       ++x; dir=olddir; sw_predice=1; 
                  }
-                 else if (dots[x+1][y+1]==2 /*|| $dots[x+1,y+1]==1*/ ) {
+                 else if (location==2 /*|| $dots[x+1,y+1]==1*/ ) {
                      score += 10;
                      ++cnt_dots;
                      dots[x+1][y+1]=1;
@@ -755,7 +769,7 @@ Main
                      }
                      cnt_void_waka=0;
 
-                 }else if ( dots[x+1][y+1]>=50 && dots[x+1][y+1]<=53 ) { // power pills!
+                 }else if ( location>=50 && location<=53 ) { // power pills!
                      if(sw_waka){
                          //kill_waka(&sw_waka,PIDWAKA);
                          kill_sound( PIDWAKA );sw_waka=0;
@@ -777,7 +791,7 @@ Main
                      status_pills[ dots[x+1][y+1]-50 ]=0;
                      --cnt_status_pills;
                      dots[x+1][y+1]=1;
-                     score += 20;
+                     score += 50;
                      sw_time_scary=0;
                      ++cnt_dots;
                      pone_score(score, &sw_extra_life_active, &vidas, level_fruit);
@@ -828,21 +842,25 @@ Main
              }
              else if(dir==DIR_RIGHT) { //{ y += y<69 ? 1 : 0; if( y==69 ) dir=tdir=0;}
                  ++y;
-                 if ( dots[x+1][y+1]>2 && dots[x+1][y+1]!=20 && dots[x+1][y+1]!=30
-                                       && dots[x+1][y+1]!=100 ) {
-                      //if(olddir==DIR_RIGHT){
-                      --y; dir=tdir=0; 
-                      if( sw_waka ){
-                         //kill_waka(&sw_waka,PIDWAKA);
-                         kill_sound( PIDWAKA );sw_waka=0;
-                         Free secure PIDWAKA;
-                         cnt_void_waka=0;
+                 int location = dots[x+1][y+1];
+                 if ( location>2 && location!=20 && location!=30
+                                       && location!=100 ) {
+                      if( location==3 && (olddir==DIR_UP || olddir==DIR_DOWN) ){
+                           --y; dir=olddir; sw_predice=1;
+                      }else{
+                           --y; dir=tdir=0; 
+                           if( sw_waka ){
+                               //kill_waka(&sw_waka,PIDWAKA);
+                               kill_sound( PIDWAKA );sw_waka=0;
+                               Free secure PIDWAKA;
+                               cnt_void_waka=0;
+                           }
                       }
                       /*}else{
                          --y; dir=olddir; sw_predice=1;
                       }*/
                  }
-                 else if ( dots[x+1][y+1]==0 ) { 
+                 else if ( location==0 ) { 
                      --y; dir=olddir; sw_predice=1; 
                 /* }else if ($dots[x+1,y+1]==3 ) {
                      if( sw_waka ){
@@ -851,7 +869,7 @@ Main
                          cnt_void_waka=0;
                      }
                  }*/
-                 }else if ( dots[x+1][y+1]==2 /*|| $dots[x+1,y+1]==1*/ ) {
+                 }else if ( location==2 /*|| $dots[x+1,y+1]==1*/ ) {
                      score += 10;
                      ++cnt_dots;
                      dots[x+1][y+1]=1;
@@ -862,7 +880,7 @@ Main
                          sw_waka=1;
                      }
                      cnt_void_waka=0;
-                 }else if ( dots[x+1][y+1]==100 ){  // fruit!!
+                 }else if ( location==100 ){  // fruit!!
                         score += point_fruit[level_fruit];
                         system("aplay -q tests/dataPacman/pacman_eatfruit.wav </dev/null >/dev/null 2>&1 &");
                         quita_fruit();
@@ -897,7 +915,7 @@ Main
                          ++y;
                      }
                      t=0;Tic(t);
-                 }else*/ if( dots[x+1][y+1] == 30 ){  // se va al otro lado
+                 }else*/ if( location == 30 ){  // se va al otro lado
                      y = 2;
                  }
                  /* verifica si ha comido todos los puntos para terminar la partida */
@@ -2077,7 +2095,7 @@ void initial_screen()
      Color( 255,BACKGROUND );
      At 60, 28; Print "▀▀              \u25cf    ▀▀";
      At 61, 28; Print "▀▀                   ▀▀";
-     At 60, 33; Put_leds(20,255,BACKGROUND);  
+     At 60, 33; Put_leds(50,255,BACKGROUND);  
      At 60, 53; Put_leds(10,255,BACKGROUND);
      
    //  Enable_raw_mode();
