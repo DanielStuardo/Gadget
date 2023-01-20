@@ -1018,7 +1018,7 @@ Main
  Disable_raw_mode();
  //Color_back(0); Color_fore( color_level[level] );
  //At 1,1; 
- Color(color_level[level],BACKGROUND); Print "%s",lab;Flush_out;
+ Color(241,BACKGROUND); Print "%s",lab;Flush_out;
     
  Reset_color;
  game_over();
