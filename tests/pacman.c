@@ -69,6 +69,11 @@ Main
     
  initial_screen();
 
+ int high;
+ high = load_high_score();
+ 
+ 
+ 
  String lab;
   
  while ( vidas > 0 ){
@@ -102,7 +107,7 @@ Main
             Stop(1);
         }
         /* preparo el laberinto para imprimirlo sin deshabilitar modo raw */
-        Fn_let(lab, prepare_lab_string( lab /*, color_level[level]*/ ));
+        Fn_let(lab, prepare_lab_string( lab, high /*, color_level[level]*/ ));
         
         Range for tdots [ 0:1:dotsLab.total_lines-1, 0:1:dotsLab.max_tokens_per_line-1 ];
         tdots = Load_matrix( pSDS(tdots), laberinth_dots[level_file[level]], dotsLab);
@@ -448,6 +453,7 @@ Main
              //Color_back(0); Color_fore( color_level[level]  );//119);
              //At 1,1; 
              Color(color_level[level],BACKGROUND); Print "%s",lab; Flush_out;
+             refresh_score(score);
              //Enable_raw_mode();
              
              Reset_color;
@@ -1029,6 +1035,8 @@ Main
  }*/
  /* aqui se libera todo, dado que siempre el jugador va a perder */
  Free secure lab;
+ 
+ save_score( score, high );
  //
 End
 
@@ -1598,7 +1606,7 @@ void draw_ascii_phantoms( int color, int bcolor,int pos )
     printf("%s",vid); Flush_out;
     //Free_secure(vid);
 }
-void Put_leds(double num, int nColorF, int nColorB)
+void Put_leds(int num, int nColorF, int nColorB)
 {
     int c, cb=0;
 
@@ -1633,6 +1641,34 @@ void Put_leds(double num, int nColorF, int nColorB)
     Free secure cnum; //, score;
 }
 
+char* Get_leds(int num, int x, int y)
+{
+    int c, cb=0;
+
+    //Str_init(cnum);
+    String cnum;  
+    cnum = Int2str(num); //Fn_let( cnum, Int2str(num));    
+    char* score=Space(4096);
+    
+    int i; //, sw=0;
+    for( i=0;i<strlen(cnum); i++){
+        char w = cnum[i];
+        c = w - 48;
+        int row = x;
+        int col = y + (i*3);
+        static char digit[512];
+        int n = sprintf( digit,"\x1b[%d;%dH%s\x1b[%d;%dH%s\x1b[%d;%dH%s",
+                row, col, cLedsh[0][c],
+                row+1,col, cLedsh[1][c],
+                row+2,col, cLedsh[2][c]);
+        const char* psimb = digit;
+        memcpy((void*) score + cb, psimb, n);
+        cb += n;
+    }
+    score[cb]='\0';
+    Free secure cnum; //, score;
+    return score;
+}
 
 /*void print_power_pills( int sw_power_pills, int px, int py )
 {
@@ -1800,11 +1836,36 @@ void pone_miniaturas( int vidas, int level_fruit )
    Reset_color;
 }
 
+void save_score(int score, int high)
+{
+   if( score > high ){
+       Stack{
+           Save_string( Int2str(score), "tests/dataPacman/high.txt" );
+       }
+   }
+}
+
+int load_high_score()
+{
+   int high=0;
+   if( Exist_file("tests/dataPacman/high.txt")){
+       Stack{
+           high = Str2int( Load_string("tests/dataPacman/high.txt"));
+       } Stack_off;
+   }
+   return high;
+}
+
+void refresh_score(int score)
+{
+   int ls = !score ? 0 : floor(log10( ( score ) ))+1;
+   At 6, 55-ls;Put_leds(score,15,BACKGROUND); Flush_out; //37
+}
 
 void pone_score(int score, int *sw_extra_active, int * vidas, int level_fruit )
 {
    int ls = !score ? 0 : floor(log10( ( score ) ))+1;
-   At 4, 37-ls;Put_leds(score,15,BACKGROUND); Flush_out;
+   At 6, 55-ls;Put_leds(score,15,BACKGROUND); Flush_out; //37
    if( sw_extra_active ){
        if ( score >= 20000 && *sw_extra_active==1 ){
            
@@ -2008,7 +2069,7 @@ void get_loc_ghost_pos( /*pRDS(int,pdots),*/ int ghostx[], int ghosty[] )
     }
 }
 
-char * prepare_lab_string( char* lab /*, int colorF*/ )
+char * prepare_lab_string( char* lab, int high /*, int colorF*/ )
 {
     int i, nlines;
     String new_lab;
@@ -2034,6 +2095,13 @@ char * prepare_lab_string( char* lab /*, int colorF*/ )
         Free secure cline;
     }
     Set_token_sep(oldsep);
+    /* pone el high */
+    int ls = !high ? 0 : floor(log10( ( high ) ))+1;
+    //char * shigh = Get_leds(high, 6, 18-ls);
+    
+    Fn_cat( new_lab, Get_leds(high, 6, 18-ls) );
+    
+    //Free secure shigh;
     return new_lab;
 }
 
@@ -2042,14 +2110,17 @@ char * prepare_lab_string( char* lab /*, int colorF*/ )
 void initial_screen()
 {
      const char* nameGhost[3][4] = {
-       {"█▀▀▙ █   ▀ █▙ █ █ ▟▀ ▜▙ ▟▛","█▀▀▙ ▀ █▙ █ █ ▟▀ ▜▙ ▟▛","▀ █▙ █ █ ▟▀ ▜▙ ▟▛"," ▟▀▀ █  ▜▙ ▟▛ █▀▀▙ ▟▀▀"},
-       {"█ █  █   █ █▀▙█ █▟▀   ▜▄▛ ","█ ▄▛ █ █▀▙█ █▟▀   ▜▄▛ ","█ █▀▙█ █▟▀   ▜▄▛ ","█    █   ▜▄▛  █  █ █▄ "},
-       {"█▄▄▛ ▜▄▄ █ █ ▜█ █ ▜▄  ▟▛  ","█    █ █ ▜█ █ ▜▄  ▟▛  ","█ █ ▜█ █ ▜▄  ▟▛  "," ▜▄▄ ▜▄▄ ▟▛   █▄▄▛ ▜▄▄"}};
+     {" ▄  ▄  ▄  ▄      ▄ ▄"," ▄  ▄  ▄  ▄   ▄ ▄","▄  ▄  ▄   ▄ ▄"," ▄▄ ▄  ▄ ▄ ▄▄   ▄▄"},
+     {"█▄▀ █  ▄ █ █ █▄▀ ▀▄▀","█▄█ ▄ █ █ █▄▀ ▀▄▀","▄ █ █ █▄▀ ▀▄▀","█   █  ▀▄▀ █ █ █▀ "},
+     {"▀▄▀  ▀ ▀ ▀ ▀ ▀ ▀  ▀ ","▀   ▀ ▀ ▀ ▀ ▀  ▀ ","▀ ▀ ▀ ▀ ▀  ▀ "," ▀▀  ▀  ▀  ▀▄▀  ▀▀"}};
+      // {"█▀▀▙ █   ▀ █▙ █ █ ▟▀ ▜▙ ▟▛","█▀▀▙ ▀ █▙ █ █ ▟▀ ▜▙ ▟▛","▀ █▙ █ █ ▟▀ ▜▙ ▟▛"," ▟▀▀ █  ▜▙ ▟▛ █▀▀▙ ▟▀▀"},
+      // {"█ █  █   █ █▀▙█ █▟▀   ▜▄▛ ","█ ▄▛ █ █▀▙█ █▟▀   ▜▄▛ ","█ █▀▙█ █▟▀   ▜▄▛ ","█    █   ▜▄▛  █  █ █▄ "},
+      // {"█▄▄▛ ▜▄▄ █ █ ▜█ █ ▜▄  ▟▛  ","█    █ █ ▜█ █ ▜▄  ▟▛  ","█ █ ▜█ █ ▜▄  ▟▛  "," ▜▄▄ ▜▄▄ ▟▛   █▄▄▛ ▜▄▄"}};
        
      Color (BACKGROUND,BACKGROUND); Cls;
      Color(240,BACKGROUND);
-     At 92, 40; Print "█▙ ▟█  ▄  █▀▙ ▟▀▙ █  ▀ ██ █▙ █";
-     At 93, 40; Print "█ ▀ █ █   █▄▛ █▀█ █▄ █ █▄ █ ▙█";
+     At 94, 45; Print "█▙ ▟█  ▄  █▀▙ ▟▀▙ █  ▀ ██ █▙ █";
+     At 95, 45; Print "█ ▀ █ █   █▄▛ █▀█ █▄ █ █▄ █ ▙█";
 
      Color(226,BACKGROUND);
      At 10,1; Print "  ██████▄▄     ▟▙         ▄▟██▄▄    █▙        ▟█       ▟▙       █▙     ███";
@@ -2069,9 +2140,9 @@ void initial_screen()
        At 32+(i*6), 28; Print "▀▀";
        At 33+(i*6), 28; Print "▀▀";
        Color( pColor[i],BACKGROUND );
-       At 32+(i*6), 32; Print "%s", nameGhost[0][i];
-       At 33+(i*6), 32; Print "%s", nameGhost[1][i];
-       At 34+(i*6), 32; Print "%s", nameGhost[2][i];
+       At 31+(i*6), 32; Print "%s", nameGhost[0][i];
+       At 32+(i*6), 32; Print "%s", nameGhost[1][i];
+       At 33+(i*6), 32; Print "%s", nameGhost[2][i];
        Reset_color;
      }
 

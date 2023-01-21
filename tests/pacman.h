@@ -48,13 +48,13 @@
 #define pacman_is_to_the_right   y > py //[i]
 #define pacman_is_up             x < px //[i]
     
-/*const char *cLedsh[3][10] = {{"╭─╮", " ╮ ", "╭─╮", "╭─╮","┐ ┐","╭─╮","╭─ ","╭─╮","╭─╮","╭─╮"},
+const char *cLedsh[3][10] = {{"╭─╮", " ╮ ", "╭─╮", "╭─╮","┐ ┐","╭─╮","╭─ ","╭─╮","╭─╮","╭─╮"},
                              {"│/│", " │ ", "╭─┘", " ─┤","└─┤","└─╮","├─╮","  │","├─┤","╰─┤"},
-                             {"╰─╯", " ┴ ", "╰─╯", "╰─╯","  ┴","╰─╯","╰─╯","  ┴","╰─╯","  ┴"}};*/
+                             {"╰─╯", " ┴ ", "╰─╯", "╰─╯","  ┴","╰─╯","╰─╯","  ┴","╰─╯","  ┴"}};
 
-const char *cLedsh[3][10] = {{"▟▀▙", " █ ", "▟▀▙", "▀▀▙","█ █","▟▀▀","▟▀ ","▀▀█","▟▀▙","▟▀▙"},
+/*const char *cLedsh[3][10] = {{"▟▀▙", " █ ", "▟▀▙", "▀▀▙","█ █","▟▀▀","▟▀ ","▀▀█","▟▀▙","▟▀▙"},
                              {"█/█", " █ ", " ▄▛", " ▄▛","▜▄█","▀▀▙","█▀▙"," ▟▛","▜▄▛","▜▄█"},
-                             {"▜▄▛", " █ ", "█▄▄", "▄▄▛","  █","▄▄▛","▜▄▛","▟▛ ","▜▄▛"," ▄▛"}};
+                             {"▜▄▛", " █ ", "█▄▄", "▄▄▛","  █","▄▄▛","▜▄▛","▟▛ ","▜▄▛"," ▄▛"}};*/
 
 const char *pacman[5][5] = {{" ▄▄▄ "," ▄▄▄ "," ▄▄▄ ","     "," ▄▄▄ "},
                             {"▟███▙","  ▜█▙","▟███▙","▟   ▙","▟█▛  "},
@@ -131,13 +131,15 @@ int analize_for_down_direction( int x, int y, int px, int py, int pprob, int i )
 
 void draw_ascii_pacman( int color, int bcolor,int pos, int boca );
 void draw_ascii_phantoms( int color, int bcolor,int pos );
-void Put_leds(double num, int nColorF, int nColorB);
+void Put_leds(int num, int nColorF, int nColorB);
+char* Get_leds(int num, int x, int y);
 void print_power_pills(int stpills[], int sw_power_pills, int px[], int py[]);
 void print_dots( int colorF, int colorB );
 void pone_fruit(int level_fruit);
 void quita_fruit();
 void pone_miniaturas( int vidas, int level_fruit );
 void pone_score(int score, int *sw_extra_active, int * vidas, int level_fruit );
+void refresh_score(int score);
 char * put_sound( int typeSound );
 void kill_sound( char * PID_SOUND );
 void kill_all_sounds();
@@ -145,8 +147,9 @@ void death_pacman(int x, int y,const char*pacman[5][5]);
 int get_total_dots();
 void get_loc_power_pills( /*pRDS(int, dots),*/ int pillx[], int pilly[], int *tx, int *ty );
 void get_loc_ghost_pos( /*pRDS(int,pdots),*/ int ghostx[], int ghosty[] );
-char * prepare_lab_string( char* lab /*, int colorF*/ );
-
+char * prepare_lab_string( char* lab, int high /*, int colorF*/ );
+void save_score(int score, int high);
+int load_high_score();
 
 void initial_screen();
 void pone_ready( int vidas,int inicio, int level_fruit,int px[], int py[], int x, int y );
