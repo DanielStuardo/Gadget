@@ -57,7 +57,7 @@ Main
  int sw_inicio=1; /* para que ponga la musica de entrada */
  int status_pills[4] = {1,1,1,1};
  int color_level[8] = {69,69,78,78,166,166,196,196}; // agregar más colores.
- int level_file[8] = {0,0,1,1,2,2,3,3};
+ int level_file[8] =  {0, 0, 1, 1, 2,  2,  3,  3};
  int pillx[4]={0,0,0,0};  // ubicación de pills.
  int pilly[4]={0,0,0,0};
  int ghostx[4]={0,0,0,0};
@@ -83,12 +83,12 @@ Main
     /* area de carga de laberintos y pantalla */
     if ( !sw_dead ){
         ++level;
-        if( level == 8 ) {level = 0; ++PLUS;}  // seguro de vida! Vuelve a empezar
+        if( level == 8 ) {level = 0; PLUS=-2; PLUS=Clamp(PLUS,0,4);}  // seguro de vida! Vuelve a empezar
         
         /* intermission */
-        if( level == 2 ) play_Act(1);
-        else if(level == 4 ) play_Act(2);
-        else if(level == 6 ) play_Act(3);
+        if( level == 2 ) {play_Act(1); ++PLUS;}
+        else if(level == 4 ) {play_Act(2); ++PLUS;}
+        else if(level == 6 ) {play_Act(3); ++PLUS;}
         
         ++level_fruit;
         if( level_fruit == 8 ) level_fruit=7; 
@@ -156,7 +156,8 @@ Main
       que deberán sustraerse de una estructura de datos */
    /* data del pacman*/ 
     int c=0, dir=0, tdir=0, olddir=0, boca=0;
-   
+    int color_pacman=226, index_shadow=0;
+    
    /* waka-waka */
     int sw_waka=0;
     int cnt_void_waka=0; // numero de wakas que no se hacen (que no come)
@@ -164,7 +165,7 @@ Main
    
    /* datos del laberinto */ 
     int sw_predice=0; /* si presiona una tecla antes de una esquina o cruce */
-    //int sw_tunnel=0;  /* si entra al tunel, debe disminuir la velocidad */
+    int sw_tunnel=0;  /* si entra al tunel, debe disminuir la velocidad */
     int sw_level_clear=0;  // indica si se ha superado el nivel.
     
    /* obtener el total de puntos del laberinto */
@@ -211,7 +212,8 @@ Main
     int piy[4]={ghosty[0],ghosty[1],ghosty[2],ghosty[3]};
     int px[4]={pix[0],pix[1],pix[2],pix[3]};  // posicion relativa, varia en el juego.
     int py[4]={piy[0],piy[1],piy[2],piy[3]};
-    int pColor[]={196,93,45,172};
+    //int pColor[]={196,93,45,172};
+    int pColor[]={196,201,45,202};
 
     //unsigned long timer_dots=0L;
     
@@ -248,6 +250,7 @@ Main
     int sw_phantom_trace=1;
     int sw_pre_eat_fruit=1;
     unsigned long t_point_fruit=0L;
+
     
     while(c!=ESCAPE ) 
     {
@@ -255,14 +258,14 @@ Main
         if( sw_pill_active ){
             if( sw_eat_first ){
             
-                if( Timer( &teating, 5000L ) ){
+                if( Timer( &teating, 5000L-(level_fruit*300) ) ){
                     sw_time_scary=1;
                     tscary=0L; tscary = Tic();
                     teating2=0L; teating2=Tic();
                     sw_eat_first=0;
                 }
             }else{
-                if( Timer( &teating2, 4000L ) ){
+                if( Timer( &teating2, 4000L-(level_fruit*300) ) ){
                     sw_eating_mode[0]=0;sw_eating_mode[1]=0;sw_eating_mode[2]=0;sw_eating_mode[3]=0;
                     sw_pill_active=0;
                     teating2=0L; teating=0L; sw_time_scary=0; sw_titile=1;ScaryColor=21;
@@ -292,6 +295,7 @@ Main
              if ( Timer( &tp[i], time_limitp[i] )){
              
                  At px[i],py[i]; draw_ascii_phantoms(BACKGROUND,BACKGROUND,i);
+
                 // if( $dots[px[i]+1, py[i]+1] == 1 || $dots[px[i]+1, py[i]+1] == 2  ){
                      switch(pdir[i]){
                          case DIR_LEFT:{ --py[i]; break; }
@@ -327,7 +331,7 @@ Main
                          time_limitp[i] = old_time_limitp[i]; sw_tunnelp[i]=0;
                          tp[i]=0;
                          tp[i]=Tic();
-                         if ( pdir[i] == DIR_LEFT )  {--py[i];}
+                         if ( pdir[i] == DIR_LEFT )  { --py[i];}
                          else { ++py[i];}
                      }
                  }else if( pdots[px[i]+1][py[i]+1] == 30 ){  // se va al otro lado
@@ -599,16 +603,11 @@ Main
                      }
                  }
                  /* verifica si entró al tunel */
-                 /*if ($dots[x+1,y+1]==20) {
-                     if (!sw_tunnel){
-                         time_limit = 70.0; sw_tunnel=1;
-                         --y;
-                     }else{
-                         time_limit = 40.0; sw_tunnel=0;
-                         --y;
-                     }
-                     t=0; Tic(t);
-                 }else */if( location == 30 ){  // se va al otro lado
+                 if (location==20) {
+                     if (!sw_tunnel) {sw_tunnel=1; color_pacman=244;index_shadow=-1;--y;}
+                     else {sw_tunnel=0; color_pacman=226; index_shadow=0; --y;}
+                 }else if( location == 30 ){  // se va al otro lado
+                     index_shadow=1;
                      y = 70;
                  }
                  /* verifica si ha comido todos los puntos para terminar la partida */
@@ -912,16 +911,19 @@ Main
                      }
                  }
                  /* verifica si entró al tunel */
-                 /*if ($dots[x+1,y+1]==20) {
-                     if (!sw_tunnel){
+                 if (location==20) {
+                     if (!sw_tunnel) {sw_tunnel=1; color_pacman=244;index_shadow=-1;++y;}
+                     else {sw_tunnel=0; color_pacman=226; index_shadow=0; ++y;}
+                     /*if (!sw_tunnel){
                          time_limit = 70L; sw_tunnel=1;
                          ++y; // para que no regrese de inmediato y colapse todo!
                      }else{
                          time_limit = 40L; sw_tunnel=0;
                          ++y;
                      }
-                     t=0;Tic(t);
-                 }else*/ if( location == 30 ){  // se va al otro lado
+                     t=0;Tic(t);*/
+                 }else if( location == 30 ){  // se va al otro lado
+                     index_shadow=1;
                      y = 2;
                  }
                  /* verifica si ha comido todos los puntos para terminar la partida */
@@ -953,8 +955,11 @@ Main
 
              //if ( (x == 2 || x == 93 || y == 2 || y == 70) && dir ) dir=tdir=0;
              Flush_inp;
-             
-             At x,y; draw_ascii_pacman(226,BACKGROUND,dir,boca);
+             if( sw_tunnel ){
+                 color_pacman += index_shadow ;
+                 color_pacman = Clamp( color_pacman, 232, 244 );
+             }
+             At x,y; draw_ascii_pacman(color_pacman,BACKGROUND,dir,boca);
              //print_dots( SDS( dots), 226,BACKGROUND);//, status_pills, sw_power_pills );
              //print_tunnel();
             
@@ -977,6 +982,7 @@ Main
          if  (Timer (&timer_dots, 30L)){
              print_dots( 226,BACKGROUND);
          }
+
          /* timer para poner los power pills */
        /*  if(status_pills[cnt_status_pills]){
              if ( Timer( &tpills[cnt_status_pills], 20L ) ){
@@ -1698,13 +1704,18 @@ void print_power_pills(int stpills[], int sw_power_pills, int px[], int py[])
                 At px[i], py[i]; Print "%s", pills[0];
                 Atrow px[i]+1  ; Print "%s", pills[1];*/
                 Print "\x1b[38;5;255m\x1b[48;5;%dm\x1b[%d;%dH%s"\
-                    "\x1b[%d;%dH%s\x1b[0m",BACKGROUND,px[i],py[i], pills[0],px[i]+1,py[i],pills[1];
+                    "\x1b[%d;%dH%s"\
+                    "\x1b[%d;%dH%s\x1b[0m"\
+                    ,BACKGROUND,px[i],py[i], pills[0],px[i]+1,py[i],pills[1]\
+                    ,px[i]+2,py[i],pills[2];
             }else{
                 /*Color(0,0);
                 At px[i], py[i]; Print "   ";
                 Atrow px[i]+1  ; Print "   ";*/
                 Print "\x1b[38;5;255m\x1b[48;5;%dm\x1b[%d;%dH   "\
-                    "\x1b[%d;%dH   \x1b[0m",BACKGROUND,px[i],py[i],px[i]+1,py[i];
+                    "\x1b[%d;%dH   "\
+                    "\x1b[%d;%dH   \x1b[0m",\
+                    BACKGROUND,px[i],py[i],px[i]+1,py[i],px[i]+2,py[i];
             }
         }
     }
@@ -2110,7 +2121,7 @@ char * prepare_lab_string( char* lab, int high /*, int colorF*/ )
 void initial_screen()
 {
      const char* nameGhost[3][4] = {
-     {" ▄  ▄  ▄  ▄      ▄ ▄"," ▄  ▄  ▄  ▄   ▄ ▄","▄  ▄  ▄   ▄ ▄"," ▄▄ ▄  ▄ ▄ ▄▄   ▄▄"},
+     {" ▄  ▄  ▄  ▄  ▄   ▄ ▄"," ▄  ▄  ▄  ▄   ▄ ▄","▄  ▄  ▄   ▄ ▄"," ▄▄ ▄  ▄ ▄ ▄▄   ▄▄"},
      {"█▄▀ █  ▄ █ █ █▄▀ ▀▄▀","█▄█ ▄ █ █ █▄▀ ▀▄▀","▄ █ █ █▄▀ ▀▄▀","█   █  ▀▄▀ █ █ █▀ "},
      {"▀▄▀  ▀ ▀ ▀ ▀ ▀ ▀  ▀ ","▀   ▀ ▀ ▀ ▀ ▀  ▀ ","▀ ▀ ▀ ▀ ▀  ▀ "," ▀▀  ▀  ▀  ▀▄▀  ▀▀"}};
       // {"█▀▀▙ █   ▀ █▙ █ █ ▟▀ ▜▙ ▟▛","█▀▀▙ ▀ █▙ █ █ ▟▀ ▜▙ ▟▛","▀ █▙ █ █ ▟▀ ▜▙ ▟▛"," ▟▀▀ █  ▜▙ ▟▛ █▀▀▙ ▟▀▀"},
@@ -2183,10 +2194,12 @@ void initial_screen()
                 Color(255,BACKGROUND);
                 At 60, 20; Print "%s", pills[0];
                 Atrow 61 ; Print "%s", pills[1];
+                Atrow 62 ; Print "%s", pills[2];
             }else{
                 Color(BACKGROUND,BACKGROUND);
                 At 60, 20; Print "   ";
                 Atrow 61 ; Print "   ";
+                Atrow 62 ; Print "   ";
             }
             sw_power_pills = sw_power_pills ? 0 : 1;
          }
@@ -2201,7 +2214,7 @@ void play_Act(int nAct)
     if (nAct==1)
     {
         system("aplay -q tests/dataPacman/mspacman_They_Meet_Act_1.wav </dev/null >/dev/null 2>&1 &");
-        sleep(8);
+        sleep(9);
     }else if( nAct==2)
     {
         system("aplay -q tests/dataPacman/mspacman_The_Chase_Act_2.wav </dev/null >/dev/null 2>&1 &");
@@ -2209,7 +2222,7 @@ void play_Act(int nAct)
     }else if(nAct==3)
     {
         system("aplay -q tests/dataPacman/mspacman_Junior_Act_3.wav </dev/null >/dev/null 2>&1 &");
-        sleep(4);
+        sleep(5);
     }
 }
 
