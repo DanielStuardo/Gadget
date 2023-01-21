@@ -1840,7 +1840,7 @@ char * put_sound( int typeSound )
 
 void kill_sound( char * PID_SOUND )
 {
-   static char strkill[256];
+   char strkill[256];
    sprintf( strkill, "kill -9 %s </dev/null >/dev/null 2>&1 &", PID_SOUND);
    system(strkill);
 }
@@ -1929,7 +1929,7 @@ void kill_all_sounds()
    //Stack { Store ( PID, Char_only( Get_sys("pidof aplay"), "0123456789" )); } Stack_off;
    Fn_let ( PID, Get_sys("pidof aplay" ));
    if (strlen(PID)>0){
-      static char cpids[256];
+      char cpids[256];
       sprintf(cpids,"kill -9 %s </dev/null >/dev/null 2>&1",PID);
       system(cpids);
    }
