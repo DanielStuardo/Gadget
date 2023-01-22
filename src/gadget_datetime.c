@@ -948,6 +948,120 @@ int Get_month( const char *cDateFBuff ){
    return iMonth;
 }
 
+unsigned long Tic(){
+    long            ms; // Milliseconds
+    time_t          s;  // Seconds
+    struct timespec spec;
+
+    clock_gettime(CLOCK_MONOTONIC /*_COARSE*/, &spec);
+
+    s  = spec.tv_sec;
+    ms = round(spec.tv_nsec / 1.0e6); 
+    if (ms > 999) {
+        s++;
+        ms = 0;
+    }
+    s = s*1.0e3 + ms;
+    return s;
+}
+double Toc(unsigned long varT)
+{
+        long            ms; // Milliseconds
+    time_t          s;  // Seconds
+    struct timespec spec;
+
+    clock_gettime(CLOCK_MONOTONIC /*_COARSE*/, &spec);
+
+    s  = spec.tv_sec;
+    ms = round(spec.tv_nsec / 1.0e6); 
+    if (ms > 999) {
+        s++;
+        ms = 0;
+    }
+    s = s*1.0e3 + ms;
+    return (s - varT)/1000.0;
+}
+int Timer( unsigned long *var, int desp){
+    long            ms; // Milliseconds
+    time_t          s;  // Seconds
+    struct timespec spec;
+
+    clock_gettime(CLOCK_MONOTONIC /*_COARSE*/, &spec);
+
+    s  = spec.tv_sec;
+    ms = round(spec.tv_nsec / 1.0e6);
+    if (ms > 999) {
+        s++;
+        ms = 0;
+    }
+    s = s*1.0e3 + ms;
+    
+    unsigned long offset = s - *var;
+    
+    if ( offset >= desp ) {
+        *var = s;
+        return 1;
+    }else return 0;
+}
+
+unsigned long uTic(){
+    long            ms; // Milliseconds
+    time_t          s;  // Seconds
+    struct timespec spec;
+
+    clock_gettime(CLOCK_MONOTONIC /*_COARSE*/, &spec);
+
+    s  = spec.tv_sec;
+    ms = round(spec.tv_nsec / 1.0e3); 
+    if (ms > 999999) {
+        s++;
+        ms = 0;
+    }
+    s = s*1.0e6 + ms;
+    return s;
+}
+int uTimer( unsigned long *var, int desp){
+    long            ms; // Milliseconds
+    time_t          s;  // Seconds
+    struct timespec spec;
+
+    clock_gettime(CLOCK_MONOTONIC /*_COARSE*/, &spec);
+
+    s  = spec.tv_sec;
+    ms = round(spec.tv_nsec / 1.0e3 ); 
+    if (ms > 999999) {
+        s++;
+        ms = 0;
+    }
+    s = s*1.0e6 + ms;
+    
+    unsigned long offset = s - *var;
+    
+    if ( offset >= desp ) {
+        *var = s;
+        return 1;
+    }else return 0;
+}
+
+double uToc(unsigned long varT)
+{
+        long            ms; // Milliseconds
+    time_t          s;  // Seconds
+    struct timespec spec;
+
+    clock_gettime(CLOCK_MONOTONIC /*_COARSE*/, &spec);
+
+    s  = spec.tv_sec;
+    ms = round(spec.tv_nsec / 1.0e3); 
+    if (ms > 999999) {
+        s++;
+        ms = 0;
+    }
+    s = s*1.0e6 + ms;
+    return (s - varT)/1000000.0;
+}
+
+/*
 int Timer( unsigned long * nVarTimer, unsigned long nTimeMillisec ){   // trabaja con clock().
   clock_t tiempo = clock();
 
@@ -967,7 +1081,7 @@ unsigned long Toc(unsigned long nVarT1 ){
 
    clock_t tiempo = clock();
    return (unsigned long)(( tiempo - nVarT1 ) / CLOCKS_PER_SEC);
-}
+}*/
 
 ///#define   Tic(_X_)            _X_ = clock();
 ///#define   Toc(_X_,_Y_)        _Y_ = ( clock() - (_X_) ) / CLOCKS_PER_SEC;
