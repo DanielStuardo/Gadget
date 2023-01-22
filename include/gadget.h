@@ -2814,10 +2814,12 @@ int Get_year( const char *cDateF );
 int Get_day( const char *cDateF );
 int Get_month( const char *cDateF );
 
+/* 1000 = 1 segundo */
 int Timer( unsigned long * nVarTimer, int nTimeMillisec );
 unsigned long Tic();
 double Toc(unsigned long nVarT1 );
 
+/* 1000000 = 1 segundo */
 int uTimer( unsigned long * nVarTimer, int nTimeMicrosec );
 unsigned long uTic();
 double uToc(unsigned long nVarT1 );
