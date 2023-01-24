@@ -56,8 +56,8 @@ Main
  int sw_extra_life_active=2;
  int sw_inicio=1; /* para que ponga la musica de entrada */
  int status_pills[4] = {1,1,1,1};
- int color_level[8] = {69,69,78,78,166,166,196,196}; // agregar más colores.
- int level_file[8] =  {0, 0, 1, 1, 2,  2,  3,  3};
+ int color_level[11] = {69,69,78,78,78,166,166,166,196,196,196}; // agregar más colores.
+ int level_file[11] =  {0, 0, 1, 1, 1, 2,  2,  2,  3,  3,  3};
  int pillx[4]={0,0,0,0};  // ubicación de pills.
  int pilly[4]={0,0,0,0};
  int ghostx[4]={0,0,0,0};
@@ -66,7 +66,7 @@ Main
  Hide_cursor;
     
  Enable_raw_mode();
-    
+
  initial_screen();
 
  int high;
@@ -83,12 +83,12 @@ Main
     /* area de carga de laberintos y pantalla */
     if ( !sw_dead ){
         ++level;
-        if( level == 8 ) {level = 0; PLUS=-2; PLUS=Clamp(PLUS,0,4);}  // seguro de vida! Vuelve a empezar
+        if( level == 11 ) {level = 0; /*PLUS=-2; PLUS=Clamp(PLUS,0,4);*/}  // seguro de vida! Vuelve a empezar
         
         /* intermission */
-        if( level == 2 ) {play_Act(1); ++PLUS;}
-        else if(level == 4 ) {play_Act(2); ++PLUS;}
-        else if(level == 6 ) {play_Act(3); ++PLUS;}
+        if( level == 2 ) {play_Act(1); /*++PLUS;*/}
+        else if(level == 5 ) {play_Act(2); /*++PLUS;*/}
+        else if(level == 8 ) {play_Act(3); /*++PLUS;*/}
         
         ++level_fruit;
         if( level_fruit == 8 ) level_fruit=7; 
@@ -2208,21 +2208,306 @@ void initial_screen()
 
 }
 
-/* TODO: animations!! */
+/* animations!! */
 void play_Act(int nAct)
 {
     if (nAct==1)
     {
         system("aplay -q tests/dataPacman/mspacman_They_Meet_Act_1.wav </dev/null >/dev/null 2>&1 &");
-        sleep(9);
+        unsigned long t = Tic(), tg=Tic();
+        int y=1, yg=1, boca=0, swp=1,swg=0;
+        int yb=71, ygb=71;
+        while ( swp || swg){
+           if (swp ){
+              When ( Timer( &t, 50L ) ){
+                 At 22,y-1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,boca);
+                 At 22,y++; draw_ascii_pacman(226,BACKGROUND,DIR_RIGHT,boca);
+                 
+                 At 32,yb+1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_LEFT,boca);
+                 At 32,yb--; draw_ascii_pacman(225,BACKGROUND,DIR_LEFT,boca);
+                 boca = boca ? 0 : 1;
+              }
+              When( y == 71 ){
+                 At 22,y-1;  draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,boca);
+                 At 32,yb+1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_LEFT,boca);
+                 swp=0;
+              }
+           }
+           
+           if ( y>=25 ) swg=1;
+           When( swg ){
+              if( yg==71 ){
+                  At 22, yg-1; draw_ascii_phantoms(BACKGROUND,BACKGROUND,0);
+                  At 32, ygb+1; draw_ascii_phantoms(BACKGROUND,BACKGROUND,0);
+                  swg=0;
+              }else{
+                  When( Timer( &tg, 37L ) ){
+                      At 22, yg-1; draw_ascii_phantoms(BACKGROUND,BACKGROUND,1);
+                      At 22, yg++; draw_ascii_phantoms(1,BACKGROUND,1);
+                      
+                      At 32, ygb+1; draw_ascii_phantoms(BACKGROUND,BACKGROUND,2);
+                      At 32, ygb--; draw_ascii_phantoms(2,BACKGROUND,2);
+                  }
+              }
+           }
+        }
+        usleep(500000);
+        String PIDPILLS, PIDEATGHOST;
+        Fn_let( PIDPILLS, put_sound(SND_PILLS));
+        //sleep(1);
+        usleep(500000);
+        
+        Fn_let( PIDEATGHOST, put_sound(SND_EATGHOST)); 
+        usleep(500000);
+        kill_sound(PIDEATGHOST); Free secure PIDEATGHOST;
+        Fn_let( PIDEATGHOST, put_sound(SND_EATGHOST)); 
+        usleep(500000);
+        kill_sound(PIDEATGHOST);
+        kill_sound(PIDPILLS); 
+        usleep(500000);
+        Free secure PIDPILLS, PIDEATGHOST;
+        
+        y=1, yg=1, boca=0, swp=1,swg=0;
+        yb=71, ygb=71;
+        while ( swp || swg){
+           if (swp ){
+              When ( Timer( &t, 50L ) ){
+                 At 32,y-1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,boca);
+                 At 32,y++; draw_ascii_pacman(225,BACKGROUND,DIR_RIGHT,boca);
+                 
+                 At 32,yb+1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_LEFT,boca);
+                 At 32,yb--; draw_ascii_pacman(226,BACKGROUND,DIR_LEFT,boca);
+                 boca = boca ? 0 : 1;
+              }
+              When( y == 34 ){
+                 //At 32,y-1;  draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,boca);
+                 //At 32,yb+1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_LEFT,boca);
+                 swp=0;
+              }
+           }
+        }
+        usleep(500000);
+           Print "\x1b[38;5;196m\x1b[48;5;232m\x1b[23;36H%s"\
+                 "\x1b[38;5;196m\x1b[48;5;232m\x1b[24;36H%s"\
+                 "\x1b[38;5;196m\x1b[48;5;232m\x1b[25;36H%s",\
+                 fruits[0][6],\
+                 fruits[1][6],\
+                 fruits[2][6];
+           Flush_out;
+           Reset_color;
+        sleep(2);
+        //Pause();
     }else if( nAct==2)
     {
+        Color(BACKGROUND,BACKGROUND);
+        Cls;
+
         system("aplay -q tests/dataPacman/mspacman_The_Chase_Act_2.wav </dev/null >/dev/null 2>&1 &");
-        sleep(21);
+        sleep(2);
+        int sw=1, swp=1, y=1, yb=71, boca=0, x=22;
+        int cnt=0, tope=71;
+        Seed_by_Time();
+        unsigned long t=Tic();
+        while(swp){
+            When ( Timer( &t, 35L) ){
+              if (sw){
+                 At x,y-1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,boca);
+                 At x,y++; draw_ascii_pacman(226,BACKGROUND,DIR_RIGHT,boca);
+                 
+                 When( y == tope ){
+                    At x,y-1;  draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,boca);
+                    yb=71;
+                    sw=0;
+                    cnt++;
+                    if( cnt == 3 ) { swp=0; continue; }
+                    else x = rand()%80;
+                    if (x<10) x=10;
+                    sleep(1);
+                 }
+                 boca = boca ? 0 : 1;
+                 //sleep(1);
+              }else{
+//              When ( Timer( &t, 35L-cnt ) ){
+                 At x,yb+1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_LEFT,boca);
+                 At x,yb--; draw_ascii_pacman(226,BACKGROUND,DIR_LEFT,boca);
+                 
+                 When( yb== 1 ){
+                    At x,yb+1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_LEFT,boca);
+                    y=1;
+                    sw=1;
+                    x = rand()%80;
+                    if (x<10) x=10;
+                    sleep(1);
+                    //cnt++;
+                    if( cnt == 2 ) {
+                        x = 40;
+                        Print "\x1b[38;5;82m\x1b[48;5;232m\x1b[%d;46H%s"\
+                              "\x1b[38;5;196m\x1b[48;5;232m\x1b[%d;46H%s"\
+                              "\x1b[38;5;196m\x1b[48;5;232m\x1b[%d;46H%s",\
+                              x+1,fruits[0][5],\
+                              x+2,fruits[1][5],\
+                              x+3,fruits[2][5];
+                        Flush_out;
+                        Reset_color;
+                        tope=46;
+                        //swp=0;
+                    }
+                 }
+                 boca = boca ? 0 : 1;
+                 //sleep(1);
+                 
+              }
+           }
+        }
+        system("aplay -q tests/dataPacman/pacman_eatfruit.wav </dev/null >/dev/null 2>&1 &");
+        At x,y-1;  draw_ascii_pacman(226,BACKGROUND,DIR_RIGHT,0);
+        swp=1;
+        while(swp){
+            When ( Timer( &t, 20L) ){
+                At x,y+1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_LEFT,boca);
+                At x,y--; draw_ascii_pacman(226,BACKGROUND,DIR_LEFT,boca);
+                 
+                When( y == 1 ){
+                    At x,y+1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_LEFT,boca);
+                    swp=0;
+                }
+                boca = boca ? 0 : 1;
+            }
+        }
+        swp=1; y=71;
+        At x,30; draw_ascii_pacman(225,BACKGROUND,DIR_RIGHT,1);
+        while(swp){
+            When ( Timer( &t, 40L) ){
+                At x,y+1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_LEFT,boca);
+                At x,y--; draw_ascii_pacman(226,BACKGROUND,DIR_LEFT,boca);
+                 
+                When( y == 41 ){
+                    At x,y+1; draw_ascii_pacman(226,BACKGROUND,DIR_LEFT,0);
+                    swp=0;
+                }
+                boca = boca ? 0 : 1;
+            }
+        }
+        
+        Print "\x1b[38;5;82m\x1b[48;5;232m\x1b[%d;37H%s"\
+              "\x1b[38;5;196m\x1b[48;5;232m\x1b[%d;37H%s"\
+              "\x1b[38;5;196m\x1b[48;5;232m\x1b[%d;37H%s",\
+              x+1,fruits[0][5],\
+              x+2,fruits[1][5],\
+              x+3,fruits[2][5];
+              Flush_out;
+              Reset_color;
+        usleep(500000);
+        At x,30; draw_ascii_pacman(225,BACKGROUND,DIR_RIGHT,0);
+        usleep(500000);
+        Print "\x1b[38;5;196m\x1b[48;5;232m\x1b[%d;30H%s"\
+              "\x1b[38;5;196m\x1b[48;5;232m\x1b[%d;30H%s"\
+              "\x1b[38;5;196m\x1b[48;5;232m\x1b[%d;30H%s",\
+              x-4,fruits[0][6],\
+              x-3,fruits[1][6],\
+              x-2,fruits[2][6];
+           Flush_out;
+           Reset_color;
+        sleep(2);
     }else if(nAct==3)
     {
+                              
+        Color(BACKGROUND,BACKGROUND);
+        Cls;
+        At 60,10; draw_ascii_pacman(226,BACKGROUND,DIR_RIGHT,0);
+        At 60,16; draw_ascii_pacman(225,BACKGROUND,DIR_RIGHT,0);
+        
         system("aplay -q tests/dataPacman/mspacman_Junior_Act_3.wav </dev/null >/dev/null 2>&1 &");
-        sleep(5);
+        int swf=1, cnt=0, x=31, y=55, yb=0, swjr=0 ; 
+
+        while(swf){
+
+                 Color(15,232);
+                 At 30, y; Print "      ▟▙      ▄▟▛   ";
+                 At 31, y; Print "  \x1b[38;5;166m▀▀▀▀▀█▙\x1b[38;5;15m  ▄▟██▀    ";
+                 At 32, y; Print "        ▜▟█████▛▀   ";
+                 At 33, y; Print "          ▀▀▀▀      ";
+                 At 34, y; Print "                    ";
+                 At 35, y; Print "                    "; Flush_out;
+                 
+                 if( !swjr ){
+                 if( x!=62 && cnt > 2 ) {
+                     Color(232,232);
+                     At x+1, y; Print " ▟   ";
+                     At x+2, y; Print "▟█▙  ";
+                     At x+3, y; Print "▜█▛  "; Flush_out;
+                     x+=2;
+                     if ( x>=61 ) {x=61; swjr=1;yb=y;}
+                 }
+                 Color(69,232);
+                 At x+1, y; Print " ▟";
+                 At x+2, y; Print "▟█▙";
+                 At x+3, y; Print "▜█▛"; Flush_out;
+                 }
+                // --y;
+                 //sw=0;
+                 usleep(80000);
+                 Color(232,232);
+                 At 30, y; Print "      ▟▙      ▄▟▛   ";
+                 At 31, y; Print "  ▀▀▀▀▀█▙  ▄▟██▀    ";
+                 At 32, y; Print "        ▜▟█████▛▀   ";
+                 At 33, y; Print "          ▀▀▀▀      ";
+                 At 34, y; Print "                    ";
+                 At 35, y; Print "                    ";Flush_out;
+                 y-=2;
+
+                 Color(15,232);
+                 At 30, y; Print "      ▟▙           ";
+                 At 31, y; Print "  \x1b[38;5;166m▀▀▀▀▀█▙\x1b[38;5;15m          ";
+                 At 32, y; Print "        ▜▟████▛▀   ";
+                 At 33, y; Print "          ▀▀▜██    ";
+                 At 34, y; Print "              ▜█   ";
+                 At 35, y; Print "               ▜   "; 
+                 At 31, Flush_out;
+                 if( !swjr ){
+                 if( x!=62 && cnt > 2 ) {
+                     Color(232,232);
+                     At x+1, y+2; Print " ▟   ";
+                     At x+2, y+2; Print "▟█▙  ";
+                     At x+3, y+2; Print "▜█▛  "; Flush_out;
+                     x+=2;
+                     if ( x>=61 ) {x=61; swjr=1;yb=y;}
+                 }
+
+                 Color(69,232);
+                 At x+1, y; Print " ▟";
+                 At x+2, y; Print "▟█▙";
+                 At x+3, y; Print "▜█▛"; Flush_out;
+                 }
+                 usleep(80000);
+                 Color(232,232);
+                 At 30, y; Print "      ▟▙           ";
+                 At 31, y; Print "  ▀▀▀▀▀█▙          ";
+                 At 32, y; Print "        ▜▟████▛▀   ";
+                 At 33, y; Print "          ▀▀▜██    ";
+                 At 34, y; Print "              ▜█   ";
+                 At 35, y; Print "               ▜   "; Flush_out;
+
+                 --y;
+
+                 cnt++;
+
+           if ( y <= 1 ) swf=0;
+        }
+        sleep(1);
+        Color(226,232);
+        At x+1, yb; Print "  ┳";
+        At x+2, yb; Print " ▜▙";
+        At x+3, yb; Print " ▟▛"; Flush_out;     
+        Print "\x1b[38;5;196m\x1b[48;5;232m\x1b[56;14H%s"\
+              "\x1b[38;5;196m\x1b[48;5;232m\x1b[57;14H%s"\
+              "\x1b[38;5;196m\x1b[48;5;232m\x1b[58;14H%s",\
+              fruits[0][6],\
+              fruits[1][6],\
+              fruits[2][6];
+           Flush_out;
+           Reset_color;   
+        sleep(2);
     }
 }
 
