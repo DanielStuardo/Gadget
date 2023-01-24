@@ -137,6 +137,8 @@ Estos son screen-shots de algunos ejemplos donde se usó la librería.
 
 ![Pacman Game Linux Console](tests/dataPacman/Pacman_play.png)
 
+![Pacman Game Linux Console](tests/dataPacman/pacmanp3.png)
+
 # Tabla periódica de los elementos.
 
 ![Periodic Linux Console](tests/Tabla_periodica_rosetta_code_02.png)
