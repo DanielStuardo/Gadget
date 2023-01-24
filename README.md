@@ -131,6 +131,10 @@ Si encuentra que esto es poco adecuado, puede usar bloques de función.
 
 Estos son screen-shots de algunos ejemplos donde se usó la librería.
 
+Nota: esta librería no es una librería gráfica. "Pacman" está en modo consola,
+solo que se ha usado el terminal "RXVT" con tamaño de pixel 5. La "Tabla periódica
+está desplegada en el terminal virtual de GNOME.
+
 # Pacman.
 
 ![Pacman Game Linux Console](tests/dataPacman/Pacman_initial_screen.png)
