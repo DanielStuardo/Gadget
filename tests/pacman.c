@@ -41,6 +41,13 @@ LIB_GADGET_START
  
 Main
 
+ int sw_play_acts=0;
+ if ( Arg_count == 2 ){
+     Get_arg_str( opt_play, 1 );
+     if ( Is_equal_str(opt_play,"-a") )
+        sw_play_acts=1;
+ }
+
  DEC_PREC=0;
     
  int vidas = 3;
@@ -67,7 +74,10 @@ Main
     
  Enable_raw_mode();
 
+ Assert( !sw_play_acts, show_acts );
+
  initial_screen();
+ 
 
  int high;
  high = load_high_score();
@@ -1035,7 +1045,6 @@ Main
  Reset_color;
  game_over();
 
- Show_cursor;
 /* Exception( fail_dots_file ){
     Msg_red("Archivo de puntos no es matriciable");
  }*/
@@ -1043,6 +1052,16 @@ Main
  Free secure lab;
  
  save_score( score, high );
+ 
+ Exception( show_acts ){
+    play_Act(1);
+    sleep(2);
+    play_Act(2);
+    sleep(2);
+    play_Act(3);
+    sleep(2);
+ }
+ Show_cursor;
  //
 End
 
@@ -2213,6 +2232,8 @@ void play_Act(int nAct)
 {
     if (nAct==1)
     {
+        Color(BACKGROUND,BACKGROUND);
+        Cls;
         system("aplay -q tests/dataPacman/mspacman_They_Meet_Act_1.wav </dev/null >/dev/null 2>&1 &");
         unsigned long t = Tic(), tg=Tic();
         int y=1, yg=1, boca=0, swp=1,swg=0;
