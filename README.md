@@ -145,7 +145,7 @@ Estos son screen-shots de algunos ejemplos donde se usó la librería.
 
 # Tabs.
 
-![Pacman Game Linux Console](tests/tabs.png)
+![Tabs Linux Console](tests/tabs.png)
 
 # Menu.
 
@@ -157,6 +157,13 @@ Estos son screen-shots de algunos ejemplos donde se usó la librería.
 
 ![Objects Linux Console](tests/radiob2.png)
 
+# Casillas de selección y otros botones.
+
+![Objects Linux Console](tests/casillas0.png)
+
+![Objects Linux Console](tests/casillas1.png)
+
+![Objects Linux Console](tests/casillas3.png)
 
 # Conclusión
 
