@@ -137,6 +137,25 @@ Estos son screen-shots de algunos ejemplos donde se usó la librería.
 
 ![Pacman Game Linux Console](tests/dataPacman/Pacman_play.png)
 
+# Tabla periódica de los elementos.
+
+![Periodic Linux Console](tests/Tabla_periodica_rosetta_code_02.png)
+
+# Tabs.
+
+![Pacman Game Linux Console](tests/tabs.png)
+
+# Menu.
+
+![Menu Linux Console](tests/menu_gadget.png)
+
+# Radio buttons, Buttons y calendario.
+
+![Objects Linux Console](tests/radiob1.png)
+
+![Objects Linux Console](tests/radiob2.png)
+
+
 # Conclusión
 
 Si surge alguna incompatibilidad en alguna otra distribución de
