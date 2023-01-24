@@ -127,6 +127,18 @@ y no como:
 
 Si encuentra que esto es poco adecuado, puede usar bloques de función.
 
+# Algunos ejemplos...
+
+Estos son screen-shots de algunos ejemplos donde se usó la librería.
+
+# Pacman.
+
+![Pacman Game Linux Console](tests/dataPacman/Pacman_initial_screen.png)
+
+![Pacman Game Linux Console](tests/dataPacman/Pacman_play.png)
+
+# Conclusión
+
 Si surge alguna incompatibilidad en alguna otra distribución de
 Linux diferente de Debian y derivados, comuníquemela al correo
 preguntando por "Mr. Dalien", o bien, corríjalo usted mismo y
