@@ -74,6 +74,10 @@ Main
     
  Enable_raw_mode();
 
+ //play_Act(3);
+ //Show_cursor;
+ //Stop(1);
+
  Assert( !sw_play_acts, show_acts );
 
  initial_screen();
@@ -96,9 +100,11 @@ Main
         if( level == 11 ) {level = 0; /*PLUS=-2; PLUS=Clamp(PLUS,0,4);*/}  // seguro de vida! Vuelve a empezar
         
         /* intermission */
-        if( level == 2 ) {play_Act(1); /*++PLUS;*/}
-        else if(level == 5 ) {play_Act(2); /*++PLUS;*/}
-        else if(level == 8 ) {play_Act(3); /*++PLUS;*/}
+        if( level == 2 ) {play_Act(1); ++PLUS;}
+        else if(level == 5 ) {play_Act(2); ++PLUS;}
+        else if(level == 8 ) {play_Act(3); ++PLUS;}
+        
+        PLUS=Clamp(PLUS,0,5);
         
         ++level_fruit;
         if( level_fruit == 8 ) level_fruit=7; 
@@ -2136,6 +2142,33 @@ char * prepare_lab_string( char* lab, int high /*, int colorF*/ )
 }
 
 
+void put_big_message(char *msg, int nColorF, int nColorB)
+{
+    String tmsg;
+    Fn_let( tmsg, Upper( msg ) );
+    const char* ps = tmsg;
+    int row = SCREEN_ROW;
+    int col = SCREEN_COL;
+    while (*ps){
+        char lett = *ps;
+        int i;
+        if( lett == 32 ) i=26;
+        else if ( lett == '!' ) i=27;
+        else if ( lett == '.' ) i=28;
+        else i = lett - 'A';
+        char letter[1024];
+        sprintf( letter,"\x1b[38;5;%dm\x1b[48;5;%dm\x1b[%d;%dH%s\x1b[%d;%dH%s\x1b[%d;%dH%s\x1b[0m",
+                nColorF, nColorB, row, col, letters[0][i],
+                row+1,col, letters[1][i],
+                row+2,col, letters[2][i]);
+        const char* psimb = letter;
+        col = col + size_letter[i]+1;
+        ++ps;
+        Print "%s",psimb; Flush_out;
+    }
+    Free secure tmsg;
+}
+
 /* Esta presentación es mala... pero es míiiiiiiiiaaaaaaa */
 void initial_screen()
 {
@@ -2143,14 +2176,12 @@ void initial_screen()
      {" ▄  ▄  ▄  ▄  ▄   ▄ ▄"," ▄  ▄  ▄  ▄   ▄ ▄","▄  ▄  ▄   ▄ ▄"," ▄▄ ▄  ▄ ▄ ▄▄   ▄▄"},
      {"█▄▀ █  ▄ █ █ █▄▀ ▀▄▀","█▄█ ▄ █ █ █▄▀ ▀▄▀","▄ █ █ █▄▀ ▀▄▀","█   █  ▀▄▀ █ █ █▀ "},
      {"▀▄▀  ▀ ▀ ▀ ▀ ▀ ▀  ▀ ","▀   ▀ ▀ ▀ ▀ ▀  ▀ ","▀ ▀ ▀ ▀ ▀  ▀ "," ▀▀  ▀  ▀  ▀▄▀  ▀▀"}};
-      // {"█▀▀▙ █   ▀ █▙ █ █ ▟▀ ▜▙ ▟▛","█▀▀▙ ▀ █▙ █ █ ▟▀ ▜▙ ▟▛","▀ █▙ █ █ ▟▀ ▜▙ ▟▛"," ▟▀▀ █  ▜▙ ▟▛ █▀▀▙ ▟▀▀"},
-      // {"█ █  █   █ █▀▙█ █▟▀   ▜▄▛ ","█ ▄▛ █ █▀▙█ █▟▀   ▜▄▛ ","█ █▀▙█ █▟▀   ▜▄▛ ","█    █   ▜▄▛  █  █ █▄ "},
-      // {"█▄▄▛ ▜▄▄ █ █ ▜█ █ ▜▄  ▟▛  ","█    █ █ ▜█ █ ▜▄  ▟▛  ","█ █ ▜█ █ ▜▄  ▟▛  "," ▜▄▄ ▜▄▄ ▟▛   █▄▄▛ ▜▄▄"}};
        
      Color (BACKGROUND,BACKGROUND); Cls;
-     Color(240,BACKGROUND);
-     At 94, 45; Print "█▙ ▟█  ▄  █▀▙ ▟▀▙ █  ▀ ██ █▙ █";
-     At 95, 45; Print "█ ▀ █ █   █▄▛ █▀█ █▄ █ █▄ █ ▙█";
+     //Color(240,BACKGROUND);
+     At 94,40 ; put_big_message("MR. DALIEN",240,BACKGROUND);
+     //At 94, 45; Print "█▙ ▟█  ▄  █▀▙ ▟▀▙ █  ▀ ██ █▙ █";
+     //At 95, 45; Print "█ ▀ █ █   █▄▛ █▀█ █▄ █ █▄ █ ▙█";
 
      Color(226,BACKGROUND);
      At 10,1; Print "  ██████▄▄     ▟▙         ▄▟██▄▄    █▙        ▟█       ▟▙       █▙     ███";
@@ -2177,14 +2208,14 @@ void initial_screen()
      }
 
      Flush_out;
-     int col=9, sw=1;
+     int col=6, sw=1;
      Iterator up i[0:1:8]{
        Color(color_fruit[0][i],BACKGROUND); At 75,col; Print "%s", fruits[0][i];
        Color(color_fruit[1][i],BACKGROUND); Atrow 76; Print "%s", fruits[1][i];
        Color(color_fruit[1][i],BACKGROUND); Atrow 77; Print "%s", fruits[2][i];
        
-       if( sw ) { At 70, col-2; }
-       else     { At 80, col-2; }
+       if( sw ) { At 70, col;} //-2; }
+       else     { At 80, col;} //-2; }
        sw = sw ? 0 : 1;
        Put_leds(point_fruit[i],166,BACKGROUND);
        Flush_out;
@@ -2227,6 +2258,7 @@ void initial_screen()
 
 }
 
+
 /* animations!! */
 void play_Act(int nAct)
 {
@@ -2234,6 +2266,7 @@ void play_Act(int nAct)
     {
         Color(BACKGROUND,BACKGROUND);
         Cls;
+        At 5,22 ; put_big_message("THEY MEET",121,0);
         system("aplay -q tests/dataPacman/mspacman_They_Meet_Act_1.wav </dev/null >/dev/null 2>&1 &");
         unsigned long t = Tic(), tg=Tic();
         int y=1, yg=1, boca=0, swp=1,swg=0;
@@ -2322,6 +2355,7 @@ void play_Act(int nAct)
     {
         Color(BACKGROUND,BACKGROUND);
         Cls;
+        At 5,18 ; put_big_message("THE craving",121,0);
 
         system("aplay -q tests/dataPacman/mspacman_The_Chase_Act_2.wav </dev/null >/dev/null 2>&1 &");
         sleep(2);
@@ -2342,7 +2376,7 @@ void play_Act(int nAct)
                     cnt++;
                     if( cnt == 3 ) { swp=0; continue; }
                     else x = rand()%80;
-                    if (x<10) x=10;
+                    if (x<20) x=20;
                     sleep(1);
                  }
                  boca = boca ? 0 : 1;
@@ -2357,7 +2391,7 @@ void play_Act(int nAct)
                     y=1;
                     sw=1;
                     x = rand()%80;
-                    if (x<10) x=10;
+                    if (x<20) x=20;
                     sleep(1);
                     //cnt++;
                     if( cnt == 2 ) {
@@ -2435,15 +2469,16 @@ void play_Act(int nAct)
                               
         Color(BACKGROUND,BACKGROUND);
         Cls;
-        At 60,10; draw_ascii_pacman(226,BACKGROUND,DIR_RIGHT,0);
-        At 60,16; draw_ascii_pacman(225,BACKGROUND,DIR_RIGHT,0);
+        At 5,27 ; put_big_message("JUNIOR",121,0);
+        At 60,10; draw_ascii_pacman(226,BACKGROUND,DIR_RIGHT,1);
+        At 60,16; draw_ascii_pacman(225,BACKGROUND,DIR_RIGHT,1);
         
         system("aplay -q tests/dataPacman/mspacman_Junior_Act_3.wav </dev/null >/dev/null 2>&1 &");
         int swf=1, cnt=0, x=31, y=55, yb=0, swjr=0 ; 
 
         while(swf){
 
-                 Color(15,232);
+                 Color(15,0);
                  At 30, y; Print "      ▟▙      ▄▟▛   ";
                  At 31, y; Print "  \x1b[38;5;166m▀▀▀▀▀█▙\x1b[38;5;15m  ▄▟██▀    ";
                  At 32, y; Print "        ▜▟█████▛▀   ";
@@ -2453,14 +2488,14 @@ void play_Act(int nAct)
                  
                  if( !swjr ){
                  if( x!=62 && cnt > 2 ) {
-                     Color(232,232);
+                     Color(0,0);
                      At x+1, y; Print " ▟   ";
                      At x+2, y; Print "▟█▙  ";
                      At x+3, y; Print "▜█▛  "; Flush_out;
                      x+=2;
                      if ( x>=61 ) {x=61; swjr=1;yb=y;}
                  }
-                 Color(69,232);
+                 Color(69,0);
                  At x+1, y; Print " ▟";
                  At x+2, y; Print "▟█▙";
                  At x+3, y; Print "▜█▛"; Flush_out;
@@ -2468,7 +2503,7 @@ void play_Act(int nAct)
                 // --y;
                  //sw=0;
                  usleep(80000);
-                 Color(232,232);
+                 Color(0,0);
                  At 30, y; Print "      ▟▙      ▄▟▛   ";
                  At 31, y; Print "  ▀▀▀▀▀█▙  ▄▟██▀    ";
                  At 32, y; Print "        ▜▟█████▛▀   ";
@@ -2477,7 +2512,7 @@ void play_Act(int nAct)
                  At 35, y; Print "                    ";Flush_out;
                  y-=2;
 
-                 Color(15,232);
+                 Color(15,0);
                  At 30, y; Print "      ▟▙           ";
                  At 31, y; Print "  \x1b[38;5;166m▀▀▀▀▀█▙\x1b[38;5;15m          ";
                  At 32, y; Print "        ▜▟████▛▀   ";
@@ -2487,7 +2522,7 @@ void play_Act(int nAct)
                  At 31, Flush_out;
                  if( !swjr ){
                  if( x!=62 && cnt > 2 ) {
-                     Color(232,232);
+                     Color(0,0);
                      At x+1, y+2; Print " ▟   ";
                      At x+2, y+2; Print "▟█▙  ";
                      At x+3, y+2; Print "▜█▛  "; Flush_out;
@@ -2495,13 +2530,13 @@ void play_Act(int nAct)
                      if ( x>=61 ) {x=61; swjr=1;yb=y;}
                  }
 
-                 Color(69,232);
+                 Color(69,0);
                  At x+1, y; Print " ▟";
                  At x+2, y; Print "▟█▙";
                  At x+3, y; Print "▜█▛"; Flush_out;
                  }
                  usleep(80000);
-                 Color(232,232);
+                 Color(0,0);
                  At 30, y; Print "      ▟▙           ";
                  At 31, y; Print "  ▀▀▀▀▀█▙          ";
                  At 32, y; Print "        ▜▟████▛▀   ";
@@ -2519,7 +2554,11 @@ void play_Act(int nAct)
         Color(226,232);
         At x+1, yb; Print "  ┳";
         At x+2, yb; Print " ▜▙";
-        At x+3, yb; Print " ▟▛"; Flush_out;     
+        At x+3, yb; Print " ▟▛"; Flush_out;
+        usleep(400000);
+        At 60,10; draw_ascii_pacman(226,BACKGROUND,DIR_RIGHT,0);
+        At 60,16; draw_ascii_pacman(225,BACKGROUND,DIR_RIGHT,0);
+
         Print "\x1b[38;5;196m\x1b[48;5;232m\x1b[56;14H%s"\
               "\x1b[38;5;196m\x1b[48;5;232m\x1b[57;14H%s"\
               "\x1b[38;5;196m\x1b[48;5;232m\x1b[58;14H%s",\
@@ -2536,22 +2575,24 @@ void  pone_ready( int vidas,int inicio, int level_fruit, //const char*pacman[5][
                   int px[], int py[], int x, int y )
 {
    int i=1;
-   
+   int color=121;
    if (inicio){
       //char *PAC_INIT = "aplay tests/dataPacman/mspacman_beginning.wav </dev/null >/dev/null 2>&1 &";
       system( PAC_INIT );
    }
    
    pone_miniaturas(vidas, level_fruit);
-   Color(121,BACKGROUND);
+   //Color(121,BACKGROUND);
    while ( i<=2 ){
-      At 62, 28; Print " ▄   ▄▄  ▄  ▄▄  ▄ ▄ ▄▄ ";
+      /*At 62, 28; Print " ▄   ▄▄  ▄  ▄▄  ▄ ▄ ▄▄ ";
       At 63, 28; Print "█▄▀ █▀  █▄█ █ █ ▀▄▀ █▛ ";
-      At 64, 28; Print "▀ ▀  ▀▀ ▀ ▀ ▀▄▀  ▀  ▄  ";
+      At 64, 28; Print "▀ ▀  ▀▀ ▀ ▀ ▀▄▀  ▀  ▄  ";*/
+      At 62,28 ; put_big_message("READY!",color,BACKGROUND);
       Flush_out;
       if ( i==1 ) sleep(2);
    
-      Color(BACKGROUND,BACKGROUND);
+      //Color(BACKGROUND,BACKGROUND);
+      color=BACKGROUND;
       ++i;
    }
    pone_miniaturas(vidas-1, level_fruit);
