@@ -800,7 +800,13 @@ do{\
           Let(_X_,___TempValue___);Free_secure(___TempValue___);\
       }else{Msg_red("Block_string: se devuelve un tipo no esperado");}\
    }while(0);
-   
+
+#define Get_option(_V_,_C_)  \
+        _V_[1]='\0';\
+        do{\
+           _V_[0] = Getch();\
+        }while(!Occurs(_V_,_C_));
+
 #define Where(_X_)  _X_
 #define Then(_X_)   _X_
 #define Do_it(_X_,_Y_,_Z_)  _Y_;\
