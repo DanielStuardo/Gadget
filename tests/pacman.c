@@ -41,11 +41,14 @@ LIB_GADGET_START
  
 Main
 
- int sw_play_acts=0;
+ int sw_play_acts=0, sw_continue_play=0;
  if ( Arg_count == 2 ){
      Get_arg_str( opt_play, 1 );
      if ( Is_equal_str(opt_play,"-a") )
         sw_play_acts=1;
+     else if( Is_equal_str(opt_play, "-c") )
+        sw_continue_play=1;
+     Free secure opt_play;
  }
 
  DEC_PREC=0;
@@ -229,7 +232,7 @@ Main
     int px[4]={pix[0],pix[1],pix[2],pix[3]};  // posicion relativa, varia en el juego.
     int py[4]={piy[0],piy[1],piy[2],piy[3]};
     //int pColor[]={196,93,45,172};
-    int pColor[]={196,201,45,202};
+    int pColor[]={196,201,45,172};
 
     //unsigned long timer_dots=0L;
     
@@ -1039,7 +1042,18 @@ Main
         Free secure PIDWAKA, PIDPILLS,PIDEATGHOST, PIDSIREN;
         //Disable_raw_mode();
     }
-    
+
+    if ( !vidas && sw_continue_play ){
+        At 52,23 ; put_big_message("Continue?",202,BACKGROUND);
+        char ans[2]; // debe declarar así para usar Get_option()
+        Get_option(ans, "YySsNn");
+
+        if( Occurs( ans,"YySs") ){
+            score=0;
+            vidas=3;
+            Free secure PIDWAKA, PIDPILLS,PIDEATGHOST, PIDSIREN;
+        }
+    }
  } /* MAIN WHILE */
 
 
@@ -2144,29 +2158,37 @@ char * prepare_lab_string( char* lab, int high /*, int colorF*/ )
 
 void put_big_message(char *msg, int nColorF, int nColorB)
 {
-    String tmsg;
-    Fn_let( tmsg, Upper( msg ) );
-    const char* ps = tmsg;
+    //String tmsg;
+    //Fn_let( tmsg, Upper( msg ) );
+    const char* ps = msg; //tmsg;
     int row = SCREEN_ROW;
     int col = SCREEN_COL;
     while (*ps){
         char lett = *ps;
-        int i;
+        int i,sw=0;
         if( lett == 32 ) i=26;
         else if ( lett == '!' ) i=27;
         else if ( lett == '.' ) i=28;
-        else i = lett - 'A';
+        else if ( lett == '?' ) i=29;
+        else{ 
+            if( isupper(lett) ){
+                sw=1; i = lett - 'A';
+            }else{
+                i = lett - 'a';
+            }
+            ///i = isupper(lett) ? lett - 'A' : lett - 'a';
+        }
         char letter[1024];
         sprintf( letter,"\x1b[38;5;%dm\x1b[48;5;%dm\x1b[%d;%dH%s\x1b[%d;%dH%s\x1b[%d;%dH%s\x1b[0m",
-                nColorF, nColorB, row, col, letters[0][i],
-                row+1,col, letters[1][i],
-                row+2,col, letters[2][i]);
+                nColorF, nColorB, row, col, (sw ? letters_C[0][i]:letters[0][i]),
+                row+1,col, (sw ? letters_C[1][i]:letters[1][i]),
+                row+2,col, (sw ? letters_C[2][i]:letters[2][i]));
         const char* psimb = letter;
-        col = col + size_letter[i]+1;
+        col = col + (sw ? size_letter_C[i]+1 : size_letter[i]+1);
         ++ps;
         Print "%s",psimb; Flush_out;
     }
-    Free secure tmsg;
+    //Free secure tmsg;
 }
 
 /* Esta presentación es mala... pero es míiiiiiiiiaaaaaaa */
@@ -2179,7 +2201,7 @@ void initial_screen()
        
      Color (BACKGROUND,BACKGROUND); Cls;
      //Color(240,BACKGROUND);
-     At 94,40 ; put_big_message("MR. DALIEN",240,BACKGROUND);
+     At 94,40 ; put_big_message("Mr. Dalien",240,BACKGROUND);
      //At 94, 45; Print "█▙ ▟█  ▄  █▀▙ ▟▀▙ █  ▀ ██ █▙ █";
      //At 95, 45; Print "█ ▀ █ █   █▄▛ █▀█ █▄ █ █▄ █ ▙█";
 
@@ -2194,7 +2216,7 @@ void initial_screen()
      
      system("aplay -q tests/dataPacman/mspacman_Coin_Credit.wav </dev/null >/dev/null 2>&1 &");
      
-     int pColor[]={196,93,45,172}, i;
+     int pColor[]={196,201,45,172}, i;
      Iterator up i[0:1:4]{
        At 30+(i*6), 20; draw_ascii_phantoms(pColor[i],BACKGROUND,i);
        Color (255,BACKGROUND);
@@ -2266,7 +2288,7 @@ void play_Act(int nAct)
     {
         Color(BACKGROUND,BACKGROUND);
         Cls;
-        At 5,22 ; put_big_message("THEY MEET",121,0);
+        At 5,22 ; put_big_message("They meet",121,0);
         system("aplay -q tests/dataPacman/mspacman_They_Meet_Act_1.wav </dev/null >/dev/null 2>&1 &");
         unsigned long t = Tic(), tg=Tic();
         int y=1, yg=1, boca=0, swp=1,swg=0;
@@ -2355,7 +2377,7 @@ void play_Act(int nAct)
     {
         Color(BACKGROUND,BACKGROUND);
         Cls;
-        At 5,18 ; put_big_message("THE craving",121,0);
+        At 5,18 ; put_big_message("The craving",121,0);
 
         system("aplay -q tests/dataPacman/mspacman_The_Chase_Act_2.wav </dev/null >/dev/null 2>&1 &");
         sleep(2);
@@ -2368,7 +2390,7 @@ void play_Act(int nAct)
               if (sw){
                  At x,y-1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,boca);
                  At x,y++; draw_ascii_pacman(226,BACKGROUND,DIR_RIGHT,boca);
-                 
+
                  When( y == tope ){
                     At x,y-1;  draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,boca);
                     yb=71;
@@ -2469,7 +2491,7 @@ void play_Act(int nAct)
                               
         Color(BACKGROUND,BACKGROUND);
         Cls;
-        At 5,27 ; put_big_message("JUNIOR",121,0);
+        At 5,27 ; put_big_message("Junior",121,0);
         At 60,10; draw_ascii_pacman(226,BACKGROUND,DIR_RIGHT,1);
         At 60,16; draw_ascii_pacman(225,BACKGROUND,DIR_RIGHT,1);
         
@@ -2587,7 +2609,7 @@ void  pone_ready( int vidas,int inicio, int level_fruit, //const char*pacman[5][
       /*At 62, 28; Print " ▄   ▄▄  ▄  ▄▄  ▄ ▄ ▄▄ ";
       At 63, 28; Print "█▄▀ █▀  █▄█ █ █ ▀▄▀ █▛ ";
       At 64, 28; Print "▀ ▀  ▀▀ ▀ ▀ ▀▄▀  ▀  ▄  ";*/
-      At 62,28 ; put_big_message("READY!",color,BACKGROUND);
+      At 62,28 ; put_big_message("Ready!",color,BACKGROUND);
       Flush_out;
       if ( i==1 ) sleep(2);
    
