@@ -38,8 +38,21 @@
 /* background */
 #define BACKGROUND  0
 
+/* Velocity starrings */
+#define VEL_PACMAN   40L
+#define VEL_RED      37L
+#define VEL_PINK     40L
+#define VEL_BLUE     40L
+#define VEL_YELLOW   41L
 
+/* laberinth colors */
+#define LAB_LEVEL1   63
+#define LAB_LEVEL2   80
+#define LAB_LEVEL3   166
+#define LAB_LEVEL4   196
+#define LAB_LEVEL5   141
 
+/* utilities */
 #define Is_not(_X_,_A_,_B_,_C_,_D_,_E_,_F_)  _X_!=(_A_) && _X_!=(_B_) && _X_!=(_C_)&&\
                                              _X_!=(_D_) && _X_!=(_E_) && _X_!=(_F_)
 
@@ -92,6 +105,12 @@ const char *pacman[5][5] = {{" ▄▄▄ "," ▄▄▄ "," ▄▄▄ ","     ","
                             {"▜███▛","  ▟█▛","▜   ▛","▜███▛","▜█▙  "},
                             {" ▀▀▀ "," ▀▀▀ ","     "," ▀▀▀ "," ▀▀▀ "}};
 
+const char *mrpacman_death[5][8] = {{"     ","     ","     ","     ","     ","     ","     ","     "},
+                                    {"▟   ▙","     ","     ","     ","     ","     ","     "," ▄ ▄ "},
+                                    {"█▙ ▟█","█▄ ▄█","▄▄ ▄▄","  ▄  ","  ▄  ","  ▄  ","  ▄  ","  ▄  "},
+                                    {"▜███▛","▜███▛","▜███▛"," ███ "," ▟█▙ ","  █  ","  █  "," ▄ ▄ "},
+                                    {" ▀▀▀ "," ▀▀▀ "," ▀▀▀ "," ▀▀▀ "," ▀▀▀ "," ▀▀▀ ","  ▀  ","     "}};
+
 const char *phantoms[5][5] = {{" ▃▄▃ "," ▃▄▃ "," ▃▄▃ "," ▃▄▃ "},
                               {"▟███▙","▟███▙","▟███▙","▟███▙"},
                               {"█ █ █","█ █ █","█ █ █","█ █ █"},
@@ -131,10 +150,27 @@ int topT=0;*/
 #define SND_SIREN      3
 
 /* estos sonidos necestan un controlador de sonidos */
+int sw_sound_p=0;  /* por dfault: Mrs. Pacman */
+
+const char *PAC_EXTRA = "aplay -q tests/dataPacman/mspacman_extrapac.wav </dev/null >/dev/null 2>&1 &";
+
+const char *MSPAC_EAT = "aplay -q tests/dataPacman/mspacman_death.wav </dev/null >/dev/null 2>&1 &";
+const char *MRPAC_EAT = "aplay -q tests/dataPacman/mrpacman_death.wav </dev/null >/dev/null 2>&1 &";
+
+const char *EAT_FRUIT = "aplay -q tests/dataPacman/pacman_eatfruit.wav </dev/null >/dev/null 2>&1 &";
+
+const char *MSPAC_INIT = "aplay -q tests/dataPacman/mspacman_beginning.wav </dev/null >/dev/null 2>&1 &";
+const char *MRPAC_INIT = "aplay -q tests/dataPacman/mrpacman_beginning.wav </dev/null >/dev/null 2>&1 &";
+
 const char* sound[4] = {"aplay -q tests/dataPacman/mspacman_waca2.wav </dev/null >/dev/null 2>&1 &",
                         "aplay -q tests/dataPacman/mspacman_scary_ghost.wav </dev/null >/dev/null 2>&1 &",
                         "aplay -q tests/dataPacman/mspacman_eatghost.wav </dev/null >/dev/null 2>&1 &",
                         "aplay -q tests/dataPacman/mspacman_siren.wav </dev/null >/dev/null 2>&1 &"};
+
+const char* mrsound[4] = {"aplay -q tests/dataPacman/mrpacman_waca1.wav </dev/null >/dev/null 2>&1 &",
+                          "aplay -q tests/dataPacman/mrpacman_scary_ghost.wav </dev/null >/dev/null 2>&1 &",
+                          "aplay -q tests/dataPacman/mrpacman_eatghost.wav </dev/null >/dev/null 2>&1 &",
+                          "aplay -q tests/dataPacman/mrpacman_siren.wav </dev/null >/dev/null 2>&1 &"};
 
 
 const char* pills[3] =   {"▟█▙","███","▜█▛"};
@@ -166,10 +202,6 @@ const char* laberinth_ghost_dots[5] = {"tests/dataPacman/phantomDots01.txt",
                                        "tests/dataPacman/phantomDots04.txt",
                                        "tests/dataPacman/phantomDots05.txt"
                                        };
-
-const char *PAC_EXTRA = "aplay -q tests/dataPacman/mspacman_extrapac.wav </dev/null >/dev/null 2>&1 &";
-const char *PAC_EAT = "aplay -q tests/dataPacman/mspacman_death.wav </dev/null >/dev/null 2>&1 &";
-const char *PAC_INIT = "aplay -q tests/dataPacman/mspacman_beginning.wav </dev/null >/dev/null 2>&1 &";
 
 /* prototipos */
 void put_big_message(char *msg, int nColorF, int nColorB);

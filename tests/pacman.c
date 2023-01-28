@@ -41,22 +41,47 @@ LIB_GADGET_START
  
 Main
 
- int sw_play_acts=0, sw_continue_play=0;
- if ( Arg_count == 2 ){
-     Get_arg_str( opt_play, 1 );
-     if ( Is_equal_str(opt_play,"-a") )
-        sw_play_acts=1;
-     else if( Is_equal_str(opt_play, "-c") )
-        sw_continue_play=1;
-     Free secure opt_play;
- }
+ int sw_play_acts=0, sw_continue_play=0, init_level=-1;
+ if ( Arg_count >= 2 ){
+     int i=0;
+     while( ++i<Arg_count ){
+         Get_arg_str( opt_play, i );
+         if ( Is_equal_str(opt_play,"-a") ){  // pacman -a
+            sw_play_acts=1;
+            break;
+         }
+         if( Is_equal_str(opt_play, "-c") ){  // pacman -c : continuar el juego
+            sw_continue_play=1;
+         }
+         if(  Is_equal_str(opt_play,"-l") ){ // pacman -l <1-5> : elegir el nivel para iniciar
+            Get_arg_int( nlevel, ++i );
+            if ( Is_between( nlevel, 1, 5 ) ){
+                switch( nlevel ){
+                    case 1: init_level = -1; break;
+                    case 2: init_level = 1; break;
+                    case 3: init_level = 4; break;
+                    case 4: init_level = 7; break;
+                    case 5: init_level = 10; break;
+                    default: init_level = -1; break;
+                }
+            }
+         }
+         if( Is_equal_str(opt_play,"-mr") ){  // sonidos Mr. pacman
+            sw_sound_p=1;
+         }
+         if( Is_equal_str(opt_play,"-mrs") ){  // sonidos Mrs. pacman
+            sw_sound_p=0;
+         }
+         Free secure opt_play;
+     }
+ } 
 
  DEC_PREC=0;
     
  int vidas = 3;
  int x=0, y=0, tx=0, ty=0;  // 77, 36
  int score = 0;
- int level = -1;
+ int level = init_level;
  int level_fruit=-1;
  int sw_dead=0;
  int cnt_status_pills=0;
@@ -66,7 +91,11 @@ Main
  int sw_extra_life_active=2;
  int sw_inicio=1; /* para que ponga la musica de entrada */
  int status_pills[4] = {1,1,1,1};
- int color_level[14] = {63,63,79,80,81,166,167,168,196,197,198,69,75,81}; // agregar más colores.
+ int color_level[14] = {LAB_LEVEL1,LAB_LEVEL1,
+                        LAB_LEVEL2,LAB_LEVEL2,LAB_LEVEL2,
+                        LAB_LEVEL3,LAB_LEVEL3,LAB_LEVEL3,
+                        LAB_LEVEL4,LAB_LEVEL4,LAB_LEVEL4,
+                        LAB_LEVEL5,LAB_LEVEL5,LAB_LEVEL5}; // agregar más colores.
  int level_file[14] =  {0, 0, 1, 1, 1, 2,  2,  2,  3,  3,  3,  4, 4, 4};
  int pillx[4]={0,0,0,0};  // ubicación de pills.
  int pilly[4]={0,0,0,0};
@@ -103,10 +132,11 @@ Main
         if( level == 14 ) {level = 0; /*PLUS=-2; PLUS=Clamp(PLUS,0,4);*/}  // seguro de vida! Vuelve a empezar
         
         /* intermission */
-        if( level == 2 ) {play_Act(1); ++PLUS;}
-        else if(level == 5 ) {play_Act(2); ++PLUS;}
-        else if(level == 8 ) {play_Act(3); ++PLUS;}
-        else if(level == 11 ) {play_Act(3); ++PLUS;}
+        
+        if( level == 2 ) {if( init_level == -1 ){ play_Act(1); } ++PLUS;}
+        else if(level == 5 ) {if( init_level == -1 ){play_Act(2);} ++PLUS;}
+        else if(level == 8 ) {if( init_level == -1 ){play_Act(3);} ++PLUS;}
+        else if(level == 11 ) {if( init_level == -1 ){play_Act(3);} ++PLUS;}
         
         PLUS=Clamp(PLUS,0,5);
         
@@ -184,6 +214,7 @@ Main
     String PIDWAKA, PIDPILLS, PIDEATGHOST, PIDSIREN;
    
    /* datos del laberinto */ 
+    int sw_escape=0;  /* si preisona ESC, no pregunta si quiere continuar el juego */
     int sw_predice=0; /* si presiona una tecla antes de una esquina o cruce */
     int sw_tunnel=0;  /* si entra al tunel, debe disminuir la velocidad */
     int sw_level_clear=0;  // indica si se ha superado el nivel.
@@ -214,8 +245,9 @@ Main
     unsigned long tscary=0L;
    
    /* datos de los phantoms */
-    unsigned long t=0L, time_limit=40L-PLUS;
-    unsigned long tp[4]={0L,0L,0L,0L}, time_limitp[4]={37L-PLUS,40L-PLUS,40L-PLUS,41L-PLUS};
+    unsigned long t=0L, time_limit=VEL_PACMAN-PLUS;
+    unsigned long tp[4]={0L,0L,0L,0L};
+    unsigned long time_limitp[4]={VEL_RED-PLUS,VEL_PINK-PLUS,VEL_BLUE-PLUS,VEL_YELLOW-PLUS};
     unsigned long old_time_limitp[]={0L,0L,0L,0L};
     int sw_tunnelp[] = {0,0,0,0};
     int sw_eating_mode[]={0,0,0,0};
@@ -570,6 +602,7 @@ Main
                                          Free secure PIDEATGHOST, PIDWAKA, PIDPILLS,PIDSIREN;
                                          cnt_void_waka=0;
                                          sw_waka=0;
+                                         sw_escape=1;
                                          continue; }
 
 //             At x,y; draw_ascii(pacman,2,121,0,boca);
@@ -624,7 +657,8 @@ Main
                      cnt_void_waka=0;
                  }else if ( location==100 ){  // fruit!!
                         score += point_fruit[level_fruit];
-                        system("aplay -q tests/dataPacman/pacman_eatfruit.wav </dev/null >/dev/null 2>&1 &");
+                        //system("aplay -q tests/dataPacman/pacman_eatfruit.wav </dev/null >/dev/null 2>&1 &");
+                        system(EAT_FRUIT);
                         quita_fruit();
                         At 62, 34;Put_leds(point_fruit[level_fruit],15,BACKGROUND);
                         
@@ -939,7 +973,8 @@ Main
                      cnt_void_waka=0;
                  }else if ( location==100 ){  // fruit!!
                         score += point_fruit[level_fruit];
-                        system("aplay -q tests/dataPacman/pacman_eatfruit.wav </dev/null >/dev/null 2>&1 &");
+                        //system("aplay -q tests/dataPacman/pacman_eatfruit.wav </dev/null >/dev/null 2>&1 &");
+                        system(EAT_FRUIT);
                         quita_fruit();
                         At 62, 34;Put_leds(point_fruit[level_fruit],15,BACKGROUND);
                         
@@ -1076,7 +1111,7 @@ Main
         //Disable_raw_mode();
     }
 
-    if ( !vidas && sw_continue_play ){
+    if ( !vidas && sw_continue_play && !sw_escape ){
         At 52,23 ; put_big_message("Continue?",202,BACKGROUND);
         char ans[2]; // debe declarar así para usar Get_option()
         Get_option(ans, "YySsNn");
@@ -1666,6 +1701,25 @@ void draw_ascii_pacman( int color, int bcolor,int pos, int boca )
     printf("%s",vid); Flush_out;
     //Free_secure(vid);
 }
+
+void death_mr_pacman(int color, int bcolor,int pos )
+{
+    int i, cntbuff=0;
+    //char * vid = (char*)calloc(1024,1);
+    static char vid[4096];
+    
+    for (i=0; i<5; i++){
+        static char psimb[ 512 ];
+        int n = sprintf( psimb, "\x1b[38;5;%dm\x1b[48;5;%dm\x1b[%d;%dH%s\x1b[0m",
+                         color,bcolor,(SCREEN_ROW+i), SCREEN_COL, mrpacman_death[i][pos]);
+        const char* pf = psimb;
+        memcpy((void *) vid + cntbuff, pf, n );
+        cntbuff = cntbuff + n;
+    }
+    vid[cntbuff]='\0';
+    printf("%s",vid); Flush_out;
+}
+
 void draw_ascii_phantoms( int color, int bcolor,int pos )
 {
     int i, cntbuff=0;
@@ -1974,7 +2028,11 @@ void pone_score(int score, int *sw_extra_active, int * vidas, int level_fruit )
 char * put_sound( int typeSound )
 {
    String PID_SOUND;
-   system( sound[ typeSound ] );
+   if( !sw_sound_p )
+       system( sound[ typeSound ] );
+   else
+       system( mrsound[ typeSound ] );
+       
    PID_SOUND = `pidof aplay`;
    char ot = Set_new_sep(' ');
    Fn_let( PID_SOUND, Get_token(PID_SOUND, 1));
@@ -2083,19 +2141,40 @@ void kill_all_sounds()
 void death_pacman(int x, int y,const char*pacman[5][5])
 {
    //static char *PAC_EAT = "aplay tests/dataPacman/mspacman_death.wav </dev/null >/dev/null 2>&1 &";
-   system( PAC_EAT );
-   int desvanece[] = {255,245,238,BACKGROUND};
-   int i;
-   for (i = 0; i<4; i++){
-       At x,y; draw_ascii_pacman(desvanece [i],BACKGROUND,1,0);
-       usleep(100000-i*1000);
-       At x,y; draw_ascii_pacman(desvanece [i],BACKGROUND,2,0);
-       usleep(100000-i*1000);
-       At x,y; draw_ascii_pacman(desvanece [i],BACKGROUND,3,0);
-       usleep(100000-i*1000);
-       At x,y; draw_ascii_pacman(desvanece [i],BACKGROUND,4,0);
-       usleep(100000-i*1000);
-   }
+   if( !sw_sound_p){
+       system( MSPAC_EAT );
+       int desvanece[] = {255,245,238,BACKGROUND};
+       int i;
+       for (i = 0; i<4; i++){
+           At x,y; draw_ascii_pacman(desvanece [i],BACKGROUND,1,0);
+           usleep(100000-i*1000);
+           At x,y; draw_ascii_pacman(desvanece [i],BACKGROUND,2,0);
+           usleep(100000-i*1000);
+           At x,y; draw_ascii_pacman(desvanece [i],BACKGROUND,3,0);
+           usleep(100000-i*1000);
+           At x,y; draw_ascii_pacman(desvanece [i],BACKGROUND,4,0);
+           usleep(100000-i*1000);
+       }
+   }else{
+       system( MRPAC_EAT );
+       At x,y; death_mr_pacman(226,BACKGROUND,0);
+       usleep(150000);
+       At x,y; death_mr_pacman(226,BACKGROUND,1);
+       usleep(150000);
+       At x,y; death_mr_pacman(226,BACKGROUND,2);
+       usleep(150000);
+       At x,y; death_mr_pacman(226,BACKGROUND,3);
+       usleep(150000);
+       At x,y; death_mr_pacman(226,BACKGROUND,4);
+       usleep(150000);
+       At x,y; death_mr_pacman(226,BACKGROUND,5);
+       usleep(150000);
+       At x,y; death_mr_pacman(226,BACKGROUND,6);
+       usleep(150000);
+       At x,y; death_mr_pacman(226,BACKGROUND,7);
+       usleep(400000);
+       At x,y; death_mr_pacman(0,BACKGROUND,7);
+   }   
    sleep(1);
    Reset_color;
 }
@@ -2478,7 +2557,8 @@ void play_Act(int nAct)
               }
            }
         }
-        system("aplay -q tests/dataPacman/pacman_eatfruit.wav </dev/null >/dev/null 2>&1 &");
+        //system("aplay -q tests/dataPacman/pacman_eatfruit.wav </dev/null >/dev/null 2>&1 &");
+        system(EAT_FRUIT);
         At x,y-1;  draw_ascii_pacman(226,BACKGROUND,DIR_RIGHT,0);
         swp=1;
         while(swp){
@@ -2642,7 +2722,11 @@ void  pone_ready( int vidas,int inicio, int level_fruit, //const char*pacman[5][
    int color=121;
    if (inicio){
       //char *PAC_INIT = "aplay tests/dataPacman/mspacman_beginning.wav </dev/null >/dev/null 2>&1 &";
-      system( PAC_INIT );
+      if (!sw_sound_p)
+          system( MSPAC_INIT );
+      else
+          system( MRPAC_INIT );
+       
    }
    
    pone_miniaturas(vidas, level_fruit);
