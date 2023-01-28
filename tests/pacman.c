@@ -66,8 +66,8 @@ Main
  int sw_extra_life_active=2;
  int sw_inicio=1; /* para que ponga la musica de entrada */
  int status_pills[4] = {1,1,1,1};
- int color_level[11] = {69,69,78,78,78,166,166,166,196,196,196}; // agregar más colores.
- int level_file[11] =  {0, 0, 1, 1, 1, 2,  2,  2,  3,  3,  3};
+ int color_level[14] = {63,63,79,80,81,166,167,168,196,197,198,69,75,81}; // agregar más colores.
+ int level_file[14] =  {0, 0, 1, 1, 1, 2,  2,  2,  3,  3,  3,  4, 4, 4};
  int pillx[4]={0,0,0,0};  // ubicación de pills.
  int pilly[4]={0,0,0,0};
  int ghostx[4]={0,0,0,0};
@@ -100,12 +100,13 @@ Main
     /* area de carga de laberintos y pantalla */
     if ( !sw_dead ){
         ++level;
-        if( level == 11 ) {level = 0; /*PLUS=-2; PLUS=Clamp(PLUS,0,4);*/}  // seguro de vida! Vuelve a empezar
+        if( level == 14 ) {level = 0; /*PLUS=-2; PLUS=Clamp(PLUS,0,4);*/}  // seguro de vida! Vuelve a empezar
         
         /* intermission */
         if( level == 2 ) {play_Act(1); ++PLUS;}
         else if(level == 5 ) {play_Act(2); ++PLUS;}
         else if(level == 8 ) {play_Act(3); ++PLUS;}
+        else if(level == 11 ) {play_Act(3); ++PLUS;}
         
         PLUS=Clamp(PLUS,0,5);
         
@@ -324,8 +325,17 @@ Main
                      }
                      
                 // }
-                 if ( ghost_direction_is( DIR_LEFT ) ) { 
-                     py[i] = analize_for_left_direction( x,y,px[i], py[i], pprob[i], i );
+                 if ( ghost_direction_is( DIR_LEFT ) ) {
+                     if ( pdots[px[i]+1][py[i]+1] == TUNNEL_R ){ // busco salida en la misma linea
+                         int k;
+                         for( k=py[i]+1; k>0; k--){
+                             if( pdots[px[i]+1][k] == TUNNEL_L ){
+                                 py[i] = k; break;
+                             }
+                         }
+                     }else{
+                         py[i] = analize_for_left_direction( x,y,px[i], py[i], pprob[i], i );
+                     }
 
                  }else if ( ghost_direction_is( DIR_DOWN ) ) { 
                      px[i] = analize_for_down_direction( x,y,px[i], py[i], pprob[i], i );
@@ -334,7 +344,16 @@ Main
                      px[i] = analize_for_up_direction( x,y,px[i], py[i], pprob[i], i );
 
                  }else if ( pdir[i] == DIR_RIGHT ){
-                     py[i] = analize_for_right_direction( x,y,px[i], py[i], pprob[i], i );
+                     if ( pdots[px[i]+1][py[i]+1] == TUNNEL_L ){ // busco salida en la misma linea
+                         int k;
+                         for( k=py[i]+1; k<76; k++){
+                             if( pdots[px[i]+1][k] == TUNNEL_R ){
+                                 py[i] = k; break;
+                             }
+                         }
+                     }else{
+                         py[i] = analize_for_right_direction( x,y,px[i], py[i], pprob[i], i );
+                     }
                      
                  }
                  /* verifica si entró al tunel */
@@ -565,7 +584,14 @@ Main
              if(dir==DIR_LEFT) {   //{ y-= y>3 ? 1 : 0; if( y==3 ) dir=tdir=0; }
                  --y;
                  int location = dots[x+1][y+1];
-                 if ( location>2 && location!=20 && location!=30
+                 if( location == TUNNEL_R ) {
+                      do{
+                         --y;
+                      }while( dots[x+1][y] != TUNNEL_L) ;
+                      --y;
+                      index_shadow=1;
+                 }
+                 else if ( location>2 && location!=20 && location!=30
                                        && location!=100 ) {
                       if( location==3 && (olddir==DIR_UP || olddir==DIR_DOWN) ){
                            ++y; dir=olddir; sw_predice=1;
@@ -867,7 +893,14 @@ Main
              else if(dir==DIR_RIGHT) { //{ y += y<69 ? 1 : 0; if( y==69 ) dir=tdir=0;}
                  ++y;
                  int location = dots[x+1][y+1];
-                 if ( location>2 && location!=20 && location!=30
+                 if( location == TUNNEL_L ) {
+                      do{
+                         ++y;
+                      }while( dots[x+1][y] != TUNNEL_R) ;
+                      ++y;
+                      index_shadow=1;
+
+                 }else if ( location>2 && location!=20 && location!=30
                                        && location!=100 ) {
                       if( location==3 && (olddir==DIR_UP || olddir==DIR_DOWN) ){
                            --y; dir=olddir; sw_predice=1;
@@ -1112,7 +1145,7 @@ int analize_for_left_direction( int x, int y, int px, int py, int pprob, int i )
                          // añadir probabilidad para que salga
                          if ( rand()%10 <= 5 )
                              ghost_go( DIR_UP );
-                     
+                         
      }else if ( ghost_found(TOP_CRUX) ) {
                          //int prob = rand()%10;
                          if ( pacman_is_down ) {
@@ -2089,7 +2122,7 @@ void get_loc_power_pills( /*pRDS(int, dots),*/ int pillx[], int pilly[], int *tx
     {
         Iterator up j[0:1:76]
         {
-            if( dots[i][j] >= 50 ){ // obtengo ubicacion absoluta de cada power pills
+            if( dots[i][j] >= 50 && dots[i][j] < 60 ){ // obtengo ubicacion absoluta de cada power pills
                  pillx[x] = i;
                  pilly[x] = j;
                  x++;
@@ -2102,18 +2135,27 @@ void get_loc_power_pills( /*pRDS(int, dots),*/ int pillx[], int pilly[], int *tx
     }
 }
 
-void get_loc_ghost_pos( /*pRDS(int,pdots),*/ int ghostx[], int ghosty[] )
+void get_loc_ghost_pos( int ghostx[], int ghosty[] )
 {
     int i,j, x=0;
     Iterator up i[0:1:101] //pRows(pdots)]
     {
         Iterator up j[0:1:76] //pCols(pdots)]
         {
-            if( pdots[i][j] >= 40 ){
-                 ghostx[x] = i-1;
-                 ghosty[x] = j-1;
-                 pdots[i][j] = 1;
-                 x++;
+            if( pdots[i][j] >= 40 && pdots[i][j] < 60 ){
+                //if( pdots[i][j] < TUNNEL_L ){
+                    ghostx[x] = i-1;
+                    ghosty[x] = j-1;
+                    pdots[i][j] = 1;
+                    x++;
+                /*}else{
+                    if(pdots[i][j] == TUNNEL_L ){
+                        topT = topT + 1;
+                        tleft[ topT ] = j-1;
+                    }else{  // debe ser TUNNEL_R
+                        tright[ topT ] = j-1;
+                    }
+                }*/
             }
         }
     }

@@ -30,6 +30,11 @@
 #define LEFT_CRUX  18
 #define RIGHT_CRUX 14
 
+/* jump inter-lab */
+#define TUNNEL_L     60 /* code M */
+#define TUNNEL_R     61 /* code P */
+//#define MAX_TUNNELS  5
+
 /* background */
 #define BACKGROUND  0
 
@@ -57,7 +62,7 @@ const char* letters[3][30]={{" ▄ ","█  "," ▄▄","  █","   "," ▄▄","
                             {" ▄▙","█▄ ","▟  "," ▄█","▟█▀","▟▄ ","▟ ▄","█▄ ","▄"," █","█▄▀","█ ","▟▀▄▀▙","▟▀▙","▄▀▀▄","▟ ▛","▟ █","█▄▀","▄▀"," █ ","█ █","▜▙ ▛","▜ ▄ ▛","▀▄▀","▜▄▛","▀▀█"," ","█ "," "," ▄▀"},
                             {"▀▄▀","▀▄▀","▀▄▄","▀▄▀","▀▄▄","█  "," █▀","█ ▙","█","▄▛","█▀▙","▀▄","█ ▀ █","█ █","▀▄▄▀","█▀ "," ▀█","█  ","▄▀"," ▀▄","▀▄▀"," ▜▛ "," ▜▀▛ ","▄▀▄","▄▛ ","▄█▄"," ","▄ ","▄"," ▄ "}};
 
-//                 A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z, ,!,.
+//                 A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z, ,!,.,?
 int size_letter[]={3,3,3,3,3,3,3,3,1,2,3,2,5,3,4,3,3,3,2,3,3,4,5,3,3,3,1,2,1,3};
 
 const char* letters_C[3][26]={{"▟▀▙","▟▀▙","▟▀▀","█▀▙","▟▀▀","▟▀▀","▟▀▀","█ █","█","  █","█  ","█  ","█▙ ▟█","█▙ █","▟▀▀▙","█▀▙","▟▀▀▙","█▀▙","▟▀▀","▀▀█▀▀","█  █","█  █","█    █","▀▄ ▄▀","▜   ▛","▀▀▀▛"},
@@ -87,12 +92,19 @@ const char *pacman[5][5] = {{" ▄▄▄ "," ▄▄▄ "," ▄▄▄ ","     ","
                             {"▜███▛","  ▟█▛","▜   ▛","▜███▛","▜█▙  "},
                             {" ▀▀▀ "," ▀▀▀ ","     "," ▀▀▀ "," ▀▀▀ "}};
 
+const char *phantoms[5][5] = {{" ▃▄▃ "," ▃▄▃ "," ▃▄▃ "," ▃▄▃ "},
+                              {"▟███▙","▟███▙","▟███▙","▟███▙"},
+                              {"█ █ █","█ █ █","█ █ █","█ █ █"},
+                              {"█████","█████","█████","█████"},
+                              {"█▀█▀█","█▀█▀█","█▀█▀█","█▀█▀█"}};
+                              
+/*
 const char *phantoms[5][5] = {{" ▄▄▄ "," ▄▄▄ "," ▄▄▄ "," ▄▄▄ "},
                               {"▟███▙","▟███▙","▟███▙","▟███▙"},
                               {"█ █ █","█ █ █","█ █ █","█ █ █"},
                               {"█████","█████","█████","█████"},
                               {"█▀█▀█","█▀█▀█","█▀█▀█","█▀█▀█"}};
-
+*/
 const char *fruits[3][8] = {{"  ▟▀ ","   ▟▀","  ▟▀ ","  ▟▀ ","   ▟▀","  ▟▀ ","▟▙ ▟▙","  █▀ "},
                             {"▟▙ ▟▙"," ▟█▙ ","▟██▙ ","▟██▙ "," ●●● ","▟██▙ ","▜███▛"," ▟█▀ "},
                             {"▜▛ ▜▛"," ▜█▛ ","▜██▛ ","▜██▛ ","●●●● ","▜██▛ "," ▜█▛ "," ▜▄▛ "}};
@@ -106,8 +118,12 @@ int point_fruit[8] = {150,300,500,700,1000,1500,2000,3000};
 
 int dots[101][76];
 int pdots[101][76];
-    int pdir[4]={DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_UP};
-    int pdiri[4]={DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_UP};
+int pdir[4]={DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_UP};
+int pdiri[4]={DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_UP};
+
+/*int tleft[MAX_TUNNELS];
+int tright[MAX_TUNNELS]; ///={0,0,0,0,0};
+int topT=0;*/
  
 #define SND_WAKA       0
 #define SND_PILLS      1
@@ -122,27 +138,34 @@ const char* sound[4] = {"aplay -q tests/dataPacman/mspacman_waca2.wav </dev/null
 
 
 const char* pills[3] =   {"▟█▙","███","▜█▛"};
+//const char* pills[3] =   {"◢ ◣"," ● ","◥ ◤"};
 
 /* aquí deben ir más laberintos */
-const char* laberinth_files[4] = {"tests/dataPacman/pacman_solid_Lab01.txt",
+const char* laberinth_files[5] = {"tests/dataPacman/pacman_solid_Lab01.txt",
                                   "tests/dataPacman/pacman_solid_Lab02.txt",
                                   "tests/dataPacman/pacman_solid_Lab03.txt",
-                                  "tests/dataPacman/pacman_solid_Lab04.txt"};
+                                  "tests/dataPacman/pacman_solid_Lab04.txt",
+                                  "tests/dataPacman/pacman_solid_Lab05.txt"
+                                  };
 /*
 const char* laberinth_files[4] = {"tests/dataPacman/pacmanLab01.txt",
                                   "tests/dataPacman/pacmanLab02.txt",
                                   "tests/dataPacman/pacmanLab03.txt",
                                   "tests/dataPacman/pacmanLab04.txt"};
 */
-const char* laberinth_dots[4] = {"tests/dataPacman/pacmanDot01.txt",
+const char* laberinth_dots[5] = {"tests/dataPacman/pacmanDot01.txt",
                                  "tests/dataPacman/pacmanDot02.txt",
                                  "tests/dataPacman/pacmanDot03.txt",
-                                 "tests/dataPacman/pacmanDot04.txt"};
+                                 "tests/dataPacman/pacmanDot04.txt",
+                                 "tests/dataPacman/pacmanDot05.txt"
+                                 };
 
-const char* laberinth_ghost_dots[4] = {"tests/dataPacman/phantomDots01.txt",
+const char* laberinth_ghost_dots[5] = {"tests/dataPacman/phantomDots01.txt",
                                        "tests/dataPacman/phantomDots02.txt",
                                        "tests/dataPacman/phantomDots03.txt",
-                                       "tests/dataPacman/phantomDots04.txt"};
+                                       "tests/dataPacman/phantomDots04.txt",
+                                       "tests/dataPacman/phantomDots05.txt"
+                                       };
 
 const char *PAC_EXTRA = "aplay -q tests/dataPacman/mspacman_extrapac.wav </dev/null >/dev/null 2>&1 &";
 const char *PAC_EAT = "aplay -q tests/dataPacman/mspacman_death.wav </dev/null >/dev/null 2>&1 &";
