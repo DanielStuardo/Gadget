@@ -84,6 +84,7 @@ Main
  int level = init_level;
  int level_fruit=-1;
  int sw_dead=0;
+ int sw_random=0;
  int cnt_status_pills=0;
  unsigned long PLUS=0L;  // cuando acabe con una partida, al volver, el juego aumenará su velocidad
  ///int extra_life=0;
@@ -106,9 +107,11 @@ Main
     
  Enable_raw_mode();
 
- //play_Act(3);
+ //play_Act(4);
  //Show_cursor;
  //Stop(1);
+ 
+ Seed_by_Time(); // nueva semilla para el generador rand
 
  Assert( !sw_play_acts, show_acts );
 
@@ -129,14 +132,22 @@ Main
     /* area de carga de laberintos y pantalla */
     if ( !sw_dead ){
         ++level;
-        if( level == 14 ) {level = 0; /*PLUS=-2; PLUS=Clamp(PLUS,0,4);*/}  // seguro de vida! Vuelve a empezar
+        if( !sw_random ){
+            if( level == 14 ) {
+                level = rand()%14; /* screens 0-13*/
+                init_level=-10;
+                sw_random=1;
+            }
+        }else{
+            level = rand()%14; 
+        }
         
         /* intermission */
         
         if( level == 2 ) {if( init_level == -1 ){ play_Act(1); } ++PLUS;}
         else if(level == 5 ) {if( init_level == -1 ){play_Act(2);} ++PLUS;}
         else if(level == 8 ) {if( init_level == -1 ){play_Act(3);} ++PLUS;}
-        else if(level == 11 ) {if( init_level == -1 ){play_Act(3);} ++PLUS;}
+        else if(level == 11 ) {if( init_level == -1 ){play_Act(4);} ++PLUS;}
         
         PLUS=Clamp(PLUS,0,5);
         
@@ -1142,12 +1153,19 @@ Main
  save_score( score, high );
  
  Exception( show_acts ){
+    //Color(BACKGROUND,BACKGROUND);
+    //Cls;
+    //Pause();
+    sleep(1);
     play_Act(1);
     sleep(2);
     play_Act(2);
     sleep(2);
     play_Act(3);
     sleep(2);
+    play_Act(4);
+    sleep(2);
+    //Pause();
  }
  Show_cursor;
  //
@@ -1693,6 +1711,31 @@ void draw_ascii_pacman( int color, int bcolor,int pos, int boca )
         static char psimb[ 512 ];
         int n = sprintf( psimb, "\x1b[38;5;%dm\x1b[48;5;%dm\x1b[%d;%dH%s\x1b[0m",
                          color,bcolor,(SCREEN_ROW+i), SCREEN_COL, pacman[i][ boca ? 0 : pos ]);
+        const char* pf = psimb;
+        memcpy((void *) vid + cntbuff, pf, n );
+        cntbuff = cntbuff + n;
+    }
+    vid[cntbuff]='\0';
+    printf("%s",vid); Flush_out;
+    //Free_secure(vid);
+}
+
+void draw_ascii_junior( int color, int bcolor, int dir, int boca )
+{
+    int i, cntbuff=0;
+    //char * vid = (char*)calloc(1024,1);
+    static char vid[4096];
+    
+    for (i=0; i<5; i++){
+        static char psimb[ 512 ];
+        int n;
+        if ( dir == 0 ){ // corre a la izquierda
+            n = sprintf( psimb, "\x1b[38;5;%dm\x1b[48;5;%dm\x1b[%d;%dH%s\x1b[0m",
+                         color,bcolor,(SCREEN_ROW+i), SCREEN_COL, junior[i][ boca ? 0 : 1 ]);
+        }else{
+            n = sprintf( psimb, "\x1b[38;5;%dm\x1b[48;5;%dm\x1b[%d;%dH%s\x1b[0m",
+                         color,bcolor,(SCREEN_ROW+i), SCREEN_COL, junior[i][ boca ? 2 : 3 ]);
+        }
         const char* pf = psimb;
         memcpy((void *) vid + cntbuff, pf, n );
         cntbuff = cntbuff + n;
@@ -2291,6 +2334,7 @@ void put_big_message(char *msg, int nColorF, int nColorB)
         else if ( lett == '!' ) i=27;
         else if ( lett == '.' ) i=28;
         else if ( lett == '?' ) i=29;
+        else if ( lett == ',' ) i=30;
         else{ 
             if( isupper(lett) ){
                 sw=1; i = lett - 'A';
@@ -2440,10 +2484,10 @@ void play_Act(int nAct)
               }else{
                   When( Timer( &tg, 37L ) ){
                       At 22, yg-1; draw_ascii_phantoms(BACKGROUND,BACKGROUND,1);
-                      At 22, yg++; draw_ascii_phantoms(1,BACKGROUND,1);
+                      At 22, yg++; draw_ascii_phantoms(196,BACKGROUND,1);
                       
                       At 32, ygb+1; draw_ascii_phantoms(BACKGROUND,BACKGROUND,2);
-                      At 32, ygb--; draw_ascii_phantoms(2,BACKGROUND,2);
+                      At 32, ygb--; draw_ascii_phantoms(45,BACKGROUND,2);
                   }
               }
            }
@@ -2711,6 +2755,119 @@ void play_Act(int nAct)
               fruits[2][6];
            Flush_out;
            Reset_color;   
+        sleep(2);
+    }
+    else if( nAct==4 ){
+        Color(BACKGROUND,BACKGROUND);
+        Cls;
+        At 5,18 ; put_big_message("Run son, run!",121,0);
+        system("aplay -q tests/dataPacman/pacman_intermission.wav </dev/null >/dev/null 2>&1 &");
+        int swp=1, swg=0, y=71, yg=71, boca=1;
+        unsigned long t = Tic(), tg=Tic();
+        while ( swp || swg ){
+           if (swp ){
+              When ( Timer( &t, 60L ) ){
+                 At 22,y--; draw_ascii_junior(226,BACKGROUND,0,boca);
+                 boca = boca ? 0 : 1;
+              }
+              When( y == 1 ){
+                 At 22,y;  draw_ascii_junior(BACKGROUND,BACKGROUND,0,boca);
+                 swp=0;
+              }
+           }
+           if ( y<=48 ) swg=1;
+           When( swg ){
+              if( yg==1 ){
+                  At 22, yg; draw_ascii_phantoms(BACKGROUND,BACKGROUND,0);
+                  swg=0;
+              }else{
+                  When( Timer( &tg, 45L ) ){
+                      At 22, yg--; draw_ascii_phantoms(BACKGROUND,BACKGROUND,0);
+                      At 22, yg; draw_ascii_phantoms(196,BACKGROUND,0);
+                  }
+              }
+           }
+        }
+
+        //usleep(900000);
+        String PIDPILLS;
+        Fn_let( PIDPILLS, put_sound(SND_PILLS));
+        usleep(900000);
+        system("aplay -q tests/dataPacman/pacman_intermission.wav </dev/null >/dev/null 2>&1 &");
+        
+        swp=0; swg=1; y=1; yg=1;
+        int swl=0, yl=1, bocal=0, bocajr=0, yjr=1, swjr=0;
+        unsigned long tl = Tic(), tjr=Tic();
+        while ( swp || swg || swl || swjr ){
+           if (swjr ){
+              When ( Timer( &tjr, 40L ) ){
+                 At 22,yjr; draw_ascii_junior(BACKGROUND,BACKGROUND,1,bocajr);
+                 At 22,++yjr; draw_ascii_junior(226,BACKGROUND,1,boca);
+                 bocajr = bocajr ? 0 : 1;
+              }
+              When( yjr >= 35 ){
+                 //At 22,yl;  draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,bocal);
+                 At 22,++yjr; draw_ascii_junior(226,BACKGROUND,1,0);
+                 swjr=0;
+              }
+           }
+           if (swl ){
+              When ( Timer( &tl, 40L ) ){
+                 At 22,yl; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,bocal);
+                 At 22,++yl; draw_ascii_pacman(225,BACKGROUND,DIR_RIGHT,bocal);
+                 bocal = bocal ? 0 : 1;
+              }
+              When( yl >= 71 ){
+                 At 22,yl;  draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,bocal);
+                 swl=0;
+              }
+           }
+           if (swp ){
+              When ( Timer( &t, 40L ) ){
+                 At 22,y; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,boca);
+                 At 22,++y; draw_ascii_pacman(226,BACKGROUND,DIR_RIGHT,boca);
+                 boca = boca ? 0 : 1;
+              }
+              When( y >= 71 ){
+                 At 22,y;  draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,boca);
+                 swp=0;
+              }
+           }
+           if ( yg==20 ) swp=1;
+           if ( yg==26 ) swl=1;
+           if ( yg==50 ) swjr=1;
+           When( swg ){
+              if( yg==71 ){
+                  At 22, yg; draw_ascii_phantoms(BACKGROUND,BACKGROUND,0);
+                  swg=0;
+              }else{
+                  When( Timer( &tg, 50L ) ){
+                      At 22, yg++; draw_ascii_phantoms(BACKGROUND,BACKGROUND,0);
+                      At 22, yg; draw_ascii_phantoms(21,BACKGROUND,0);
+                  }
+              }
+           }
+        }
+        
+        //sleep(6);
+        kill_sound(PIDPILLS); 
+        
+        Free secure PIDPILLS;
+        String PIDEATGHOST;
+        Fn_let( PIDEATGHOST, put_sound(SND_EATGHOST));
+        usleep(500000);
+        //kill_sound(PIDEATGHOST); 
+        Free secure PIDEATGHOST;
+        
+        Print "\x1b[38;5;196m\x1b[48;5;232m\x1b[17;35H%s"\
+              "\x1b[38;5;196m\x1b[48;5;232m\x1b[18;35H%s"\
+              "\x1b[38;5;196m\x1b[48;5;232m\x1b[19;35H%s",\
+              fruits[0][6],\
+              fruits[1][6],\
+              fruits[2][6];
+           Flush_out;
+           Reset_color; 
+        
         sleep(2);
     }
 }
