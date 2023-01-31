@@ -104,7 +104,7 @@ char * pop_stack_hard(const char *msg, const char *sub_msg){
        CONTADOR_PILA--;
        return line;
    }else{
-       Msg_redf("%s : argumento NULL no esperado '%s'\n",msg,sub_msg);
+       if( msg ) { Msg_redf("%s : argumento NULL no esperado '%s'\n",msg,sub_msg); }
        return NULL;
    }
 }
