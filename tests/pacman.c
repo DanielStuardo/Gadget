@@ -82,6 +82,7 @@ Main
  int x=0, y=0, tx=0, ty=0;  // 77, 36
  int score = 0;
  int level = init_level;
+ int last_level_rand=0;
  int level_fruit=-1;
  int sw_dead=0;
  int sw_random=0;
@@ -97,6 +98,11 @@ Main
                         LAB_LEVEL3,LAB_LEVEL3,LAB_LEVEL3,
                         LAB_LEVEL4,LAB_LEVEL4,LAB_LEVEL4,
                         LAB_LEVEL5,LAB_LEVEL5,LAB_LEVEL5}; // agregar más colores.
+ int flash_level[14] = {LAB_FLASH1,LAB_FLASH1,
+                        LAB_FLASH2,LAB_FLASH2,LAB_FLASH2,
+                        LAB_FLASH3,LAB_FLASH3,LAB_FLASH3,
+                        LAB_FLASH4,LAB_FLASH4,LAB_FLASH4,
+                        LAB_FLASH5,LAB_FLASH5,LAB_FLASH5}; 
  int level_file[14] =  {0, 0, 1, 1, 1, 2,  2,  2,  3,  3,  3,  4, 4, 4};
  int pillx[4]={0,0,0,0};  // ubicación de pills.
  int pilly[4]={0,0,0,0};
@@ -124,7 +130,7 @@ Main
  
  
  String lab;
-  
+
  while ( vidas > 0 ){
     
     Color_back(BACKGROUND);
@@ -134,12 +140,14 @@ Main
         ++level;
         if( !sw_random ){
             if( level == 14 ) {
-                level = rand()%14; /* screens 0-13*/
+                while ( (level = rand()%14) == last_level_rand ); 
+                last_level_rand = level;
                 init_level=-10;
                 sw_random=1;
             }
         }else{
-            level = rand()%14; 
+            while ( (level = rand()%14) == last_level_rand ); 
+            last_level_rand = level;
         }
         
         /* intermission */
@@ -584,10 +592,11 @@ Main
 //             At x,y; draw_ascii(pacman,2,0,0,boca);
 //             At x+5,y+10; draw_ascii(pacman,2,0,0,boca);
                  olddir= dir;
-                 if(c == ARROW_LEFT ) { dir=DIR_LEFT; tdir=DIR_LEFT;}
-                 else if(c == ARROW_RIGHT ) {dir=DIR_RIGHT;tdir=DIR_RIGHT;}
-                 else if(c == ARROW_UP )   {dir=DIR_UP; tdir=DIR_UP;}
-                 else if(c == ARROW_DOWN ) { dir=DIR_DOWN; tdir=DIR_DOWN;}
+                 
+                 if(c == ARROW_LEFT || c == 'a' ) { dir=DIR_LEFT; tdir=DIR_LEFT;}
+                 else if(c == ARROW_RIGHT || c == 'd' ) {dir=DIR_RIGHT;tdir=DIR_RIGHT;}
+                 else if(c == ARROW_UP  || c == 'w' )   {dir=DIR_UP; tdir=DIR_UP;}
+                 else if(c == ARROW_DOWN  || c == 's' ) { dir=DIR_DOWN; tdir=DIR_DOWN;}
 /*                 else if(c == 'p' )  { kill_all_sounds();
                                        Free secure PIDEATGHOST, PIDPILLS, PIDPILLS,PIDSIREN;
                                          cnt_void_waka=0;
@@ -775,7 +784,13 @@ Main
                          kill_sound( PIDSIREN );
                          Free secure PIDSIREN;
                      }
+                     Color( flash_level[level], BACKGROUND); Print "%s",lab;
+                     print_dots( 255,BACKGROUND);
+                     Flush_out;
                      Fn_let( PIDPILLS, put_sound(SND_PILLS)); //pone_pills());
+                     usleep(20000);
+                     Color( color_level[level], BACKGROUND); Print "%s",lab;
+                     Flush_out;
 
                      status_pills[ location-50 ]=0;
                      --cnt_status_pills;
@@ -881,7 +896,13 @@ Main
                          kill_sound( PIDSIREN );
                          Free secure PIDSIREN;
                      }
+                     Color( flash_level[level], BACKGROUND); Print "%s",lab;
+                     print_dots( 255,BACKGROUND);
+                     Flush_out;
                      Fn_let( PIDPILLS, put_sound(SND_PILLS)); //pone_pills());
+                     usleep(20000);
+                     Color( color_level[level], BACKGROUND); Print "%s",lab;
+                     Flush_out;
                      
                      status_pills[ dots[x+1][y+1]-50 ]=0;
                      --cnt_status_pills;
@@ -1153,8 +1174,8 @@ Main
  save_score( score, high );
  
  Exception( show_acts ){
-    //Color(BACKGROUND,BACKGROUND);
-    //Cls;
+    Color(BACKGROUND,BACKGROUND);
+    Cls;
     //Pause();
     sleep(1);
     play_Act(1);
@@ -1196,7 +1217,7 @@ int analize_for_left_direction( int x, int y, int px, int py, int pprob, int i )
                          ++py;
      }else if ( ghost_found( EXIT_HOME ) ){ // sale de la casa
                          // añadir probabilidad para que salga
-                         if ( rand()%10 <= 5 )
+                         if ( rand()%10 <= 3 )
                              ghost_go( DIR_UP );
                          
      }else if ( ghost_found(TOP_CRUX) ) {
@@ -1706,11 +1727,11 @@ void draw_ascii_pacman( int color, int bcolor,int pos, int boca )
     int i, cntbuff=0;
     //char * vid = (char*)calloc(1024,1);
     static char vid[4096];
-    
+    //pos = boca ? pos : pos;
     for (i=0; i<5; i++){
         static char psimb[ 512 ];
         int n = sprintf( psimb, "\x1b[38;5;%dm\x1b[48;5;%dm\x1b[%d;%dH%s\x1b[0m",
-                         color,bcolor,(SCREEN_ROW+i), SCREEN_COL, pacman[i][ boca ? 0 : pos ]);
+                         color,bcolor,(SCREEN_ROW+i), SCREEN_COL, pacman[i][ (boca ? 0 : pos) ]);
         const char* pf = psimb;
         memcpy((void *) vid + cntbuff, pf, n );
         cntbuff = cntbuff + n;
@@ -1909,7 +1930,7 @@ void print_dots( int colorF, int colorB )
           //printf("\x1b[%d;%dH\u25cf",r+1,c+1);
           static char local_point[100];
           //n = sprintf(local_point,"\x1b[%d;%dH\u25cf",i+1,j+1);
-          n = sprintf(local_point,"\x1b[%d;%dH#",i+1,j+1);
+          n = sprintf(local_point,"\x1b[%d;%dH@",i+1,j+1);
           memcpy((void*) points + cb, local_point, n);
           cb+=n;
       } 
@@ -2213,10 +2234,14 @@ void death_pacman(int x, int y,const char*pacman[5][5])
        At x,y; death_mr_pacman(226,BACKGROUND,5);
        usleep(150000);
        At x,y; death_mr_pacman(226,BACKGROUND,6);
-       usleep(150000);
-       At x,y; death_mr_pacman(226,BACKGROUND,7);
        usleep(400000);
-       At x,y; death_mr_pacman(0,BACKGROUND,7);
+       At x,y; death_mr_pacman(226,BACKGROUND,7);
+       usleep(100000);
+       At x,y; death_mr_pacman(226,BACKGROUND,8);
+       usleep(100000);
+       At x,y; death_mr_pacman(226,BACKGROUND,9);
+       usleep(400000);
+       At x,y; death_mr_pacman(0,BACKGROUND,9);
    }   
    sleep(1);
    Reset_color;
