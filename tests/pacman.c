@@ -152,12 +152,12 @@ Main
         
         /* intermission */
         
-        if( level == 2 ) {if( init_level == -1 ){ play_Act(1); } ++PLUS;}
-        else if(level == 5 ) {if( init_level == -1 ){play_Act(2);} ++PLUS;}
-        else if(level == 8 ) {if( init_level == -1 ){play_Act(3);} ++PLUS;}
-        else if(level == 11 ) {if( init_level == -1 ){play_Act(4);} ++PLUS;}
-        
-        PLUS=Clamp(PLUS,0,5);
+        if( level == 2 ) {if( init_level == -1 ){ play_Act(1); } /*++PLUS;*/}
+        else if(level == 5 ) {if( init_level == -1 ){play_Act(2);} /*++PLUS*/;}
+        else if(level == 8 ) {if( init_level == -1 ){play_Act(3);} /*++PLUS;*/}
+        else if(level == 11 ) {if( init_level == -1 ){play_Act(4);} /*++PLUS;*/}
+        ++PLUS;
+        PLUS=Clamp(PLUS,0,8);
         
         ++level_fruit;
         if( level_fruit == 8 ) level_fruit=7; 
@@ -310,19 +310,19 @@ Main
     //Enable_raw_mode();
     
     Fn_let( PIDSIREN, put_sound(SND_SIREN)); //pone_siren());
-    
+        
+    int i=0;
+    int sw_phantom_trace=1;
+    int sw_pre_eat_fruit=1;
+    unsigned long t_point_fruit=0L;
+    Flush_inp;
+
     t=Tic();    // timer para PAcman
 
     tp[0] = Tic();tp[1]=Tic();tp[2]=Tic();tp[3]=Tic();  // timer for phantoms
     tpills=Tic();
     timer_dots=Tic(); 
-    
-    int i=0;
-    int sw_phantom_trace=1;
-    int sw_pre_eat_fruit=1;
-    unsigned long t_point_fruit=0L;
 
-    
     while(c!=ESCAPE ) 
     {
         /* analiza si está en modo comer */
@@ -593,10 +593,10 @@ Main
 //             At x+5,y+10; draw_ascii(pacman,2,0,0,boca);
                  olddir= dir;
                  
-                 if(c == ARROW_LEFT || c == 'a' ) { dir=DIR_LEFT; tdir=DIR_LEFT;}
-                 else if(c == ARROW_RIGHT || c == 'd' ) {dir=DIR_RIGHT;tdir=DIR_RIGHT;}
-                 else if(c == ARROW_UP  || c == 'w' )   {dir=DIR_UP; tdir=DIR_UP;}
-                 else if(c == ARROW_DOWN  || c == 's' ) { dir=DIR_DOWN; tdir=DIR_DOWN;}
+                 if(c == ARROW_LEFT || c == 'j' ) { dir=DIR_LEFT; tdir=DIR_LEFT;}
+                 else if(c == ARROW_RIGHT || c == 'l' ) {dir=DIR_RIGHT;tdir=DIR_RIGHT;}
+                 else if(c == ARROW_UP  || c == 'i' )   {dir=DIR_UP; tdir=DIR_UP;}
+                 else if(c == ARROW_DOWN  || c == 'k' ) { dir=DIR_DOWN; tdir=DIR_DOWN;}
 /*                 else if(c == 'p' )  { kill_all_sounds();
                                        Free secure PIDEATGHOST, PIDPILLS, PIDPILLS,PIDSIREN;
                                          cnt_void_waka=0;
