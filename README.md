@@ -14,9 +14,13 @@ PRE-REQUISITOS:
    Debe instalar la librería GPM para el uso del ratón:
    
    sudo apt install gpm
+   
    sudo apt install libgpm-dev
+   
    sudo apt install libgpm2-dev
+   
    ó
+   
    sudo apt install libgpmg1-dev
    
    Debe instalar terminal rxvt (para simulación de gráficos de 4 bits):
