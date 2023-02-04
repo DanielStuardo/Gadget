@@ -25,11 +25,11 @@ Debe instalar la librería GPM para el uso del ratón:
    
 Debe instalar terminal rxvt (para simulación de gráficos de 4 bits):
    
-   sudo apt install rxvt-unicode
+     sudo apt install rxvt-unicode
    
 Debe instalar xdtool (para simular teclas):
    
-   sudo apt install xdotool
+     sudo apt install xdotool
 
 Descargue y descomprima el archivo en un directorio que usted desee.
 
