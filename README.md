@@ -11,23 +11,23 @@ LIBRERIA GADGET versión 1
 Gracias por usar esta librería.
 
 PRE-REQUISITOS:
-   Debe instalar la librería GPM para el uso del ratón:
+Debe instalar la librería GPM para el uso del ratón:
    
-   sudo apt install gpm
+     sudo apt install gpm
    
-   sudo apt install libgpm-dev
+     sudo apt install libgpm-dev
    
-   sudo apt install libgpm2-dev
+     sudo apt install libgpm2-dev
    
-   ó
+     ó
    
-   sudo apt install libgpmg1-dev
+     sudo apt install libgpmg1-dev
    
-   Debe instalar terminal rxvt (para simulación de gráficos de 4 bits):
+Debe instalar terminal rxvt (para simulación de gráficos de 4 bits):
    
    sudo apt install rxvt-unicode
    
-   Debe instalar xdtool (para simular teclas):
+Debe instalar xdtool (para simular teclas):
    
    sudo apt install xdotool
 
