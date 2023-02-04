@@ -225,7 +225,7 @@ Main
       que deberán sustraerse de una estructura de datos */
    /* data del pacman*/ 
     int c=0, dir=0, tdir=0, olddir=0, boca=0;
-    int color_pacman=226, index_shadow=0;
+    int color_pacman=COLOR_PACMAN, index_shadow=0;
     
    /* waka-waka */
     int sw_waka=0;
@@ -297,7 +297,7 @@ Main
     pone_score(score, &sw_extra_life_active, &vidas, level_fruit);
 
     pone_ready(vidas, sw_inicio, level_fruit, /*pacman, phantoms,*/ px, py, x, y);
-    print_dots( 226,BACKGROUND );//, status_pills, sw_power_pills );
+    //print_dots( COLOR_DOTS,BACKGROUND );//, status_pills, sw_power_pills );
     //print_tunnel();
 
     sw_inicio = 0;
@@ -455,7 +455,7 @@ Main
                          score += punctuation[cnt_eat];
                          show_point(x, y, punctuation[cnt_eat]);
                          Color(color_level[level],BACKGROUND); Print "%s",lab; Flush_out;
-                         print_dots( 226,BACKGROUND );
+                         print_dots( COLOR_DOTS,BACKGROUND );
 
                         // sleep(1);
                          /* devuelve al fantasma a su guarida */
@@ -551,7 +551,7 @@ Main
              
              Reset_color;
 
-             print_dots( 226,BACKGROUND);//, status_pills,sw_power_pills );
+             print_dots( COLOR_DOTS,BACKGROUND);//, status_pills,sw_power_pills );
              //print_tunnel();
              death_pacman(x,y,pacman);
              break;
@@ -704,7 +704,7 @@ Main
                  /* verifica si entró al tunel */
                  if (location==20) {
                      if (!sw_tunnel) {sw_tunnel=1; color_pacman=244;index_shadow=-1;--y;}
-                     else {sw_tunnel=0; color_pacman=226; index_shadow=0; --y;}
+                     else {sw_tunnel=0; color_pacman=COLOR_PACMAN; index_shadow=0; --y;}
                  }else if( location == 30 ){  // se va al otro lado
                      index_shadow=1;
                      y = 70;
@@ -1032,7 +1032,7 @@ Main
                  /* verifica si entró al tunel */
                  if (location==20) {
                      if (!sw_tunnel) {sw_tunnel=1; color_pacman=244;index_shadow=-1;++y;}
-                     else {sw_tunnel=0; color_pacman=226; index_shadow=0; ++y;}
+                     else {sw_tunnel=0; color_pacman=COLOR_PACMAN; index_shadow=0; ++y;}
                      /*if (!sw_tunnel){
                          time_limit = 70L; sw_tunnel=1;
                          ++y; // para que no regrese de inmediato y colapse todo!
@@ -1099,7 +1099,7 @@ Main
              }
          }
          if  (Timer (&timer_dots, 30L)){
-             print_dots( 226,BACKGROUND);
+             print_dots( COLOR_DOTS,BACKGROUND);
          }
 
          /* timer para poner los power pills */
@@ -1118,7 +1118,7 @@ Main
     if ( sw_level_clear ){
              kill_all_sounds();
              Free secure PIDEATGHOST, PIDWAKA, PIDPILLS,PIDSIREN;
-             At x,y; draw_ascii_pacman(226,BACKGROUND,0,1);
+             At x,y; draw_ascii_pacman(COLOR_PACMAN,BACKGROUND,0,1);
              sleep(1);
              cnt_void_waka=0;
              sw_waka=0;
@@ -1128,7 +1128,7 @@ Main
              Iterator up i[0:1:5]{
                  //Color_back(0); Color_fore( sw_color ? 69 : 226 );//119);
                  //At 1,1; 
-                 Color( (sw_color ? color_level[level] : 226), BACKGROUND); Print "%s",lab;
+                 Color( (sw_color ? color_level[level] : COLOR_PACMAN), BACKGROUND); Print "%s",lab;
                  Flush_out;
                  usleep(550000);
                  sw_color = sw_color ? 0 : 1;
@@ -2013,7 +2013,7 @@ void pone_miniaturas( int vidas, int level_fruit )
    
    Iterator up i [0:1:5]{
        if( i<vidas ){
-           Color (226,BACKGROUND);
+           Color (COLOR_PACMAN,BACKGROUND);
            At 99, col; Print " ▄ ";
            At 100,col; Print "███";
            At 101,col; Print " ▀ ";
@@ -2221,27 +2221,27 @@ void death_pacman(int x, int y,const char*pacman[5][5])
        }
    }else{
        system( MRPAC_EAT );
-       At x,y; death_mr_pacman(226,BACKGROUND,0);
+       At x,y; death_mr_pacman(COLOR_PACMAN,BACKGROUND,0);
        usleep(150000);
-       At x,y; death_mr_pacman(226,BACKGROUND,1);
+       At x,y; death_mr_pacman(COLOR_PACMAN,BACKGROUND,1);
        usleep(150000);
-       At x,y; death_mr_pacman(226,BACKGROUND,2);
+       At x,y; death_mr_pacman(COLOR_PACMAN,BACKGROUND,2);
        usleep(150000);
-       At x,y; death_mr_pacman(226,BACKGROUND,3);
+       At x,y; death_mr_pacman(COLOR_PACMAN,BACKGROUND,3);
        usleep(150000);
-       At x,y; death_mr_pacman(226,BACKGROUND,4);
+       At x,y; death_mr_pacman(COLOR_PACMAN,BACKGROUND,4);
        usleep(150000);
-       At x,y; death_mr_pacman(226,BACKGROUND,5);
+       At x,y; death_mr_pacman(COLOR_PACMAN,BACKGROUND,5);
        usleep(150000);
-       At x,y; death_mr_pacman(226,BACKGROUND,6);
+       At x,y; death_mr_pacman(COLOR_PACMAN,BACKGROUND,6);
        usleep(400000);
-       At x,y; death_mr_pacman(226,BACKGROUND,7);
+       At x,y; death_mr_pacman(COLOR_PACMAN,BACKGROUND,7);
        usleep(100000);
-       At x,y; death_mr_pacman(226,BACKGROUND,8);
+       At x,y; death_mr_pacman(COLOR_PACMAN,BACKGROUND,8);
        usleep(100000);
-       At x,y; death_mr_pacman(226,BACKGROUND,9);
+       At x,y; death_mr_pacman(COLOR_PACMAN,BACKGROUND,9);
        usleep(400000);
-       At x,y; death_mr_pacman(0,BACKGROUND,9);
+       At x,y; death_mr_pacman(BACKGROUND,BACKGROUND,9);
    }   
    sleep(1);
    Reset_color;
@@ -2395,7 +2395,7 @@ void initial_screen()
      //At 94, 45; Print "█▙ ▟█  ▄  █▀▙ ▟▀▙ █  ▀ ██ █▙ █";
      //At 95, 45; Print "█ ▀ █ █   █▄▛ █▀█ █▄ █ █▄ █ ▙█";
 
-     Color(226,BACKGROUND);
+     Color(COLOR_PACMAN,BACKGROUND);
      At 10,1; Print "  ██████▄▄     ▟▙         ▄▟██▄▄    █▙        ▟█       ▟▙       █▙     ███";
      At 11,1; Print "  █████████▄  ▟██▙     ▟█████████▄  ██▙      ▟██      ▟██▙      ██▙    ███";
      At 12,1; Print "  █████████▀ ▟████▙   ▄█████▀▀▀     ███▙    ▟███     ▟████▙     ███▙   ███";
@@ -2448,7 +2448,7 @@ void initial_screen()
      t = Tic(); tp = Tic();
      while ( !Kbhit() ){
          When ( Timer( &t, 80L ) ){
-             At 22,36; draw_ascii_pacman(226,BACKGROUND,DIR_LEFT,boca);
+             At 22,36; draw_ascii_pacman(COLOR_PACMAN,BACKGROUND,DIR_LEFT,boca);
              boca = boca ? 0 : 1;
          }
          When ( Timer( &tp, 220L ) ){
@@ -2487,7 +2487,7 @@ void play_Act(int nAct)
            if (swp ){
               When ( Timer( &t, 50L ) ){
                  At 22,y-1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,boca);
-                 At 22,y++; draw_ascii_pacman(226,BACKGROUND,DIR_RIGHT,boca);
+                 At 22,y++; draw_ascii_pacman(COLOR_PACMAN,BACKGROUND,DIR_RIGHT,boca);
                  
                  At 32,yb+1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_LEFT,boca);
                  At 32,yb--; draw_ascii_pacman(225,BACKGROUND,DIR_LEFT,boca);
@@ -2542,7 +2542,7 @@ void play_Act(int nAct)
                  At 32,y++; draw_ascii_pacman(225,BACKGROUND,DIR_RIGHT,boca);
                  
                  At 32,yb+1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_LEFT,boca);
-                 At 32,yb--; draw_ascii_pacman(226,BACKGROUND,DIR_LEFT,boca);
+                 At 32,yb--; draw_ascii_pacman(COLOR_PACMAN,BACKGROUND,DIR_LEFT,boca);
                  boca = boca ? 0 : 1;
               }
               When( y == 34 ){
@@ -2579,7 +2579,7 @@ void play_Act(int nAct)
             When ( Timer( &t, 35L) ){
               if (sw){
                  At x,y-1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,boca);
-                 At x,y++; draw_ascii_pacman(226,BACKGROUND,DIR_RIGHT,boca);
+                 At x,y++; draw_ascii_pacman(COLOR_PACMAN,BACKGROUND,DIR_RIGHT,boca);
 
                  When( y == tope ){
                     At x,y-1;  draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,boca);
@@ -2596,7 +2596,7 @@ void play_Act(int nAct)
               }else{
 //              When ( Timer( &t, 35L-cnt ) ){
                  At x,yb+1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_LEFT,boca);
-                 At x,yb--; draw_ascii_pacman(226,BACKGROUND,DIR_LEFT,boca);
+                 At x,yb--; draw_ascii_pacman(COLOR_PACMAN,BACKGROUND,DIR_LEFT,boca);
                  
                  When( yb== 1 ){
                     At x,yb+1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_LEFT,boca);
@@ -2628,12 +2628,12 @@ void play_Act(int nAct)
         }
         //system("aplay -q tests/dataPacman/pacman_eatfruit.wav </dev/null >/dev/null 2>&1 &");
         system(EAT_FRUIT);
-        At x,y-1;  draw_ascii_pacman(226,BACKGROUND,DIR_RIGHT,0);
+        At x,y-1;  draw_ascii_pacman(COLOR_PACMAN,BACKGROUND,DIR_RIGHT,0);
         swp=1;
         while(swp){
             When ( Timer( &t, 20L) ){
                 At x,y+1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_LEFT,boca);
-                At x,y--; draw_ascii_pacman(226,BACKGROUND,DIR_LEFT,boca);
+                At x,y--; draw_ascii_pacman(COLOR_PACMAN,BACKGROUND,DIR_LEFT,boca);
                  
                 When( y == 1 ){
                     At x,y+1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_LEFT,boca);
@@ -2647,10 +2647,10 @@ void play_Act(int nAct)
         while(swp){
             When ( Timer( &t, 40L) ){
                 At x,y+1; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_LEFT,boca);
-                At x,y--; draw_ascii_pacman(226,BACKGROUND,DIR_LEFT,boca);
+                At x,y--; draw_ascii_pacman(COLOR_PACMAN,BACKGROUND,DIR_LEFT,boca);
                  
                 When( y == 41 ){
-                    At x,y+1; draw_ascii_pacman(226,BACKGROUND,DIR_LEFT,0);
+                    At x,y+1; draw_ascii_pacman(COLOR_PACMAN,BACKGROUND,DIR_LEFT,0);
                     swp=0;
                 }
                 boca = boca ? 0 : 1;
@@ -2683,7 +2683,7 @@ void play_Act(int nAct)
         Color(BACKGROUND,BACKGROUND);
         Cls;
         At 5,27 ; put_big_message("Junior",121,0);
-        At 60,10; draw_ascii_pacman(226,BACKGROUND,DIR_RIGHT,1);
+        At 60,10; draw_ascii_pacman(COLOR_PACMAN,BACKGROUND,DIR_RIGHT,1);
         At 60,16; draw_ascii_pacman(225,BACKGROUND,DIR_RIGHT,1);
         
         system("aplay -q tests/dataPacman/mspacman_Junior_Act_3.wav </dev/null >/dev/null 2>&1 &");
@@ -2764,12 +2764,12 @@ void play_Act(int nAct)
            if ( y <= 1 ) swf=0;
         }
         sleep(1);
-        Color(226,232);
+        Color(COLOR_PACMAN,232);
         At x+1, yb; Print "  ┳";
         At x+2, yb; Print " ▜▙";
         At x+3, yb; Print " ▟▛"; Flush_out;
         usleep(400000);
-        At 60,10; draw_ascii_pacman(226,BACKGROUND,DIR_RIGHT,0);
+        At 60,10; draw_ascii_pacman(COLOR_PACMAN,BACKGROUND,DIR_RIGHT,0);
         At 60,16; draw_ascii_pacman(225,BACKGROUND,DIR_RIGHT,0);
 
         Print "\x1b[38;5;196m\x1b[48;5;232m\x1b[56;14H%s"\
@@ -2792,7 +2792,7 @@ void play_Act(int nAct)
         while ( swp || swg ){
            if (swp ){
               When ( Timer( &t, 60L ) ){
-                 At 22,y--; draw_ascii_junior(226,BACKGROUND,0,boca);
+                 At 22,y--; draw_ascii_junior(COLOR_PACMAN,BACKGROUND,0,boca);
                  boca = boca ? 0 : 1;
               }
               When( y == 1 ){
@@ -2827,12 +2827,12 @@ void play_Act(int nAct)
            if (swjr ){
               When ( Timer( &tjr, 40L ) ){
                  At 22,yjr; draw_ascii_junior(BACKGROUND,BACKGROUND,1,bocajr);
-                 At 22,++yjr; draw_ascii_junior(226,BACKGROUND,1,boca);
+                 At 22,++yjr; draw_ascii_junior(COLOR_PACMAN,BACKGROUND,1,boca);
                  bocajr = bocajr ? 0 : 1;
               }
               When( yjr >= 35 ){
                  //At 22,yl;  draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,bocal);
-                 At 22,++yjr; draw_ascii_junior(226,BACKGROUND,1,0);
+                 At 22,++yjr; draw_ascii_junior(COLOR_PACMAN,BACKGROUND,1,0);
                  swjr=0;
               }
            }
@@ -2850,7 +2850,7 @@ void play_Act(int nAct)
            if (swp ){
               When ( Timer( &t, 40L ) ){
                  At 22,y; draw_ascii_pacman(BACKGROUND,BACKGROUND,DIR_RIGHT,boca);
-                 At 22,++y; draw_ascii_pacman(226,BACKGROUND,DIR_RIGHT,boca);
+                 At 22,++y; draw_ascii_pacman(COLOR_PACMAN,BACKGROUND,DIR_RIGHT,boca);
                  boca = boca ? 0 : 1;
               }
               When( y >= 71 ){
@@ -2910,8 +2910,9 @@ void  pone_ready( int vidas,int inicio, int level_fruit, //const char*pacman[5][
           system( MRPAC_INIT );
        
    }
-   
+   print_dots( COLOR_DOTS,BACKGROUND );
    pone_miniaturas(vidas, level_fruit);
+   
    //Color(121,BACKGROUND);
    while ( i<=2 ){
       /*At 62, 28; Print " ▄   ▄▄  ▄  ▄▄  ▄ ▄ ▄▄ ";
@@ -2926,7 +2927,7 @@ void  pone_ready( int vidas,int inicio, int level_fruit, //const char*pacman[5][
       ++i;
    }
    pone_miniaturas(vidas-1, level_fruit);
-   At x,y; draw_ascii_pacman(226,BACKGROUND,0,0); // 77,36
+   At x,y; draw_ascii_pacman(COLOR_PACMAN,BACKGROUND,0,0); // 77,36
    Iterator up i[0:1:4]{
        At px[i],py[i]; draw_ascii_phantoms(15,BACKGROUND,i);
    }
@@ -2936,7 +2937,7 @@ void  pone_ready( int vidas,int inicio, int level_fruit, //const char*pacman[5][
 
 void game_over()
 {
-    Color( 226,BACKGROUND );
+    Color( COLOR_PACMAN,BACKGROUND );
     int colx = 28;
     At 49, colx; Print "                     ";
     At 50, colx; Print "   ▄▄  ▄   ▄ ▄   ▄▄  ";

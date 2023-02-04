@@ -36,7 +36,9 @@
 //#define MAX_TUNNELS  5
 
 /* background */
-#define BACKGROUND  0
+#define BACKGROUND   232 //0
+#define COLOR_PACMAN  226
+#define COLOR_DOTS  226
 
 /* Velocity starrings */
 #define VEL_PACMAN   40L
