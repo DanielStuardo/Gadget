@@ -27,7 +27,7 @@ Debe instalar terminal rxvt (para simulación de gráficos de 4 bits):
    
      sudo apt install rxvt-unicode
    
-Debe instalar xdtool (para simular teclas):
+Debe instalar xdotool (para simular teclas):
    
      sudo apt install xdotool
 
