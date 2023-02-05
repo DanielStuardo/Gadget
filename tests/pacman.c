@@ -1171,7 +1171,9 @@ Main
  /* aqui se libera todo, dado que siempre el jugador va a perder */
  Free secure lab;
  
- save_score( score, high );
+ if( !sw_continue_play ){
+    save_score( score, high );
+ }
  
  Exception( show_acts ){
     Color(BACKGROUND,BACKGROUND);
@@ -1452,10 +1454,18 @@ int analize_for_down_direction( int x, int y, int px, int py, int pprob, int i )
                                  if( rand()%10 < pprob ){
                                      ghost_go( DIR_RIGHT );
                                  }else{
-                                     ghost_go( DIR_UP );
+                                     if( rand()%10 < pprob ){
+                                         ghost_go( DIR_RIGHT );
+                                     }else{
+                                         ghost_go( DIR_LEFT );
+                                     }
                                  }
                              }else{  // está en la mismo pasillo
-                                 ghost_go( DIR_UP );
+                                 if( rand()%10 < pprob ){
+                                     ghost_go( DIR_RIGHT );
+                                 }else{
+                                     ghost_go( DIR_LEFT );
+                                 }
                              }
                          }else{   // tiene que ser igual
                              if( pacman_is_to_the_left ){  
@@ -1707,7 +1717,11 @@ int analize_for_right_direction( int x, int y, int px, int py, int pprob, int i 
                              }
                          }else{   // tiene que ser igual
                              if( pacman_is_to_the_left ){ 
-                                 ghost_go( DIR_LEFT );
+                                 if( rand()%10 < pprob ){
+                                     ghost_go( DIR_UP );
+                                 }else{
+                                     ghost_go( DIR_DOWN );
+                                 }
                              }else if( pacman_is_to_the_right ){ 
                                  if( rand()%10 <=pprob ){
                                      ghost_go( DIR_UP );
