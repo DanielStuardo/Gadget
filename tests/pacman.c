@@ -604,7 +604,17 @@ Main
                                        Pause();
                                        Fn_let( PIDSIREN, put_sound(SND_SIREN));
                                       } */
-                 else if(c == ESCAPE ) { vidas=0;
+                 else if(c == ESCAPE ) { 
+                                     kill_all_sounds();
+                                     Free secure PIDEATGHOST, PIDWAKA, PIDPILLS,PIDSIREN;
+                                     cnt_void_waka=0;
+                                     sw_waka=0;
+                                     At 52,23 ; put_big_message("End game?",202,BACKGROUND);
+                                     char ans[2]; // debe declarar así para usar Get_option()
+                                     Get_option(ans, "YySsNn");
+
+                                     if( Occurs( ans,"YySs") ){
+                                         vidas=0;
                                          /*if(sw_waka){
                                              kill_waka(&sw_waka, PIDWAKA); 
                                              Free secure PIDWAKA;
@@ -618,12 +628,25 @@ Main
                                               kill_eat_ghost(PIDEATGHOST);
                                              Free secure PIDEATGHOST;
                                          }*/
-                                         kill_all_sounds();
-                                         Free secure PIDEATGHOST, PIDWAKA, PIDPILLS,PIDSIREN;
-                                         cnt_void_waka=0;
-                                         sw_waka=0;
+                                         //kill_all_sounds();
+                                         //Free secure PIDEATGHOST, PIDWAKA, PIDPILLS,PIDSIREN;
+                                         //cnt_void_waka=0;
+                                         //sw_waka=0;
                                          sw_escape=1;
-                                         continue; }
+                                         ///continue; 
+                                     }else {
+                                         c=0;
+                                         Color( color_level[level], BACKGROUND); Print "%s",lab;
+                                         print_dots( 226,BACKGROUND);
+                                         Flush_out;
+                                         if (sw_pill_active){
+                                             Fn_let( PIDPILLS, put_sound(SND_PILLS));
+                                         }else{
+                                             Fn_let( PIDSIREN, put_sound(SND_SIREN));
+                                         }
+                                     }
+                                     continue;
+                 }
 
 //             At x,y; draw_ascii(pacman,2,121,0,boca);
 //             At x+5,y+20; draw_ascii(pacman,2,119,0,boca);
