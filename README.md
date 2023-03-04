@@ -155,6 +155,12 @@ está desplegada en el terminal virtual de GNOME.
 
 # Pacman.
 
+Compilar con: ./ccpre.sh tests/pacman -static
+
+Ejecutar con: ./tests/pacman.sh.
+
+Ver opciones de ejecución, tipo de sonido, en el código fuente.
+
 ![Pacman Game Linux Console](tests/dataPacman/Pacman_initial_screen.png)
 
 ![Pacman Game Linux Console](tests/dataPacman/Pacman_play.png)
@@ -186,6 +192,17 @@ está desplegada en el terminal virtual de GNOME.
 ![Objects Linux Console](tests/casillas1.png)
 
 ![Objects Linux Console](tests/casillas3.png)
+
+# Phoenix.
+
+Compilar con: ./ccpre.sh tests/phoenix -static
+
+Ejecutar con: ./tests/phoenix.sh.
+
+Ver opciones de ejecución, tipo de sonido, en el código fuente.
+
+![Phoenix Game Linux Console](tests/dataPacman/Phoenix_scr01.png)
+
 
 # Conclusión
 
