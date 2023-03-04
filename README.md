@@ -155,9 +155,13 @@ está desplegada en el terminal virtual de GNOME.
 
 # Pacman.
 
-Compilar con: ./ccpre.sh tests/pacman -static
+Compilar con: 
 
-Ejecutar con: ./tests/pacman.sh.
+    ./ccpre.sh tests/pacman -static
+
+Ejecutar con: 
+ 
+    ./tests/pacman.sh.
 
 Ver opciones de ejecución, tipo de sonido, en el código fuente.
 
@@ -195,13 +199,17 @@ Ver opciones de ejecución, tipo de sonido, en el código fuente.
 
 # Phoenix.
 
-Compilar con: ./ccpre.sh tests/phoenix -static
+Compilar con: 
+ 
+    ./ccpre.sh tests/phoenix -static
 
-Ejecutar con: ./tests/phoenix.sh.
+Ejecutar con: 
+
+    ./tests/phoenix.sh.
 
 Ver opciones de ejecución, tipo de sonido, en el código fuente.
 
-![Phoenix Game Linux Console](tests/dataPacman/Phoenix_scr01.png)
+![Phoenix Game Linux Console](tests/dataPhoenix/Phoenix_scr01.png)
 
 
 # Conclusión
