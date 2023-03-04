@@ -107,21 +107,22 @@ const char *evento_3[7][2] = {{"  ▄          ","      .       "},
 
 //aplay -q tests/dataPhoenix/Laser-SoundBible.wav </dev/null >/dev/null 2>&1 &
 //aplay -q tests/dataPhoenix/phoenix_blaster.wav </dev/null >/dev/null 2>&1 &
-const char* sound[14] = {"aplay -q tests/dataPhoenix/Laser-SoundBible.wav </dev/null >/dev/null 2>&1 &",
+const char* sound[16] = {"aplay -q tests/dataPhoenix/Laser-SoundBible.wav </dev/null >/dev/null 2>&1 &",
                         "aplay -q tests/dataPhoenix/ExplosionHeroe.wav </dev/null >/dev/null 2>&1 &",
                         "aplay -q tests/dataPhoenix/phoenix_laser_antimateria.wav </dev/null >/dev/null 2>&1 &",
                         "aplay -q tests/dataPhoenix/Laser_01.wav </dev/null >/dev/null 2>&1 &",
                         "aplay -q tests/dataPhoenix/ufo_launch.wav </dev/null >/dev/null 2>&1 &",
                         "aplay -q tests/dataPhoenix/RedAlert.wav </dev/null >/dev/null 2>&1 &",
                         "aplay -q tests/dataPhoenix/phoenix_inicia_batalla.wav </dev/null >/dev/null 2>&1",
-                        "aplay -q tests/dataPhoenix/phoenix_bono.wav </dev/null >/dev/null 2>&1",
+                        "aplay -q tests/dataPhoenix/phoenix_bono.wav </dev/null >/dev/null 2>&1 &",
                         "aplay -q tests/dataPhoenix/phoenix_transformation.wav </dev/null >/dev/null 2>&1 &",
                         "aplay -q tests/dataPhoenix/phoenix_minimize.wav </dev/null >/dev/null 2>&1 &",
                         "aplay -q tests/dataPhoenix/phoenix_show_score.wav </dev/null >/dev/null 2>&1 &",
                         "aplay -q tests/dataPhoenix/phoenix_mision.wav </dev/null >/dev/null 2>&1 &",
                         "aplay -q tests/dataPhoenix/phoenix_blaster.wav </dev/null >/dev/null 2>&1 &",
-                        "aplay -q tests/dataPhoenix/phoenix_balance.wav </dev/null >/dev/null 2>&1 &"};
-                        //"aplay -q tests/dataPhoenix/phoenix_block_out.wav </dev/null >/dev/null 2>&1 &"};
+                        "aplay -q tests/dataPhoenix/phoenix_balance.wav </dev/null >/dev/null 2>&1 &",
+                        "aplay -q tests/dataPhoenix/condicionRed.wav </dev/null >/dev/null 2>&1 &",
+                        "aplay -q tests/dataPhoenix/alive.wav </dev/null >/dev/null 2>&1 &"};
 
 const char*string_fondo[5] = {"ffplay -nodisp -loglevel -8 -loop 9999 tests/dataPhoenix/phoenix_fondo_1.wav </dev/null >/dev/null 2>&1 &",
                               "ffplay -nodisp -loglevel -8 -loop 9999 tests/dataPhoenix/phoenix_fondo_2.wav </dev/null >/dev/null 2>&1 &",
@@ -209,7 +210,7 @@ int limite_fondo[4];
 String PIDPILLS;
 
 /* parametros */
-#define INCREMENT   25 //18
+#define INCREMENT   30 //25 //18
 int swetapa=7;  // 7-1 esto debe ser proporcionado por el programa principal
 int hasta_donde=150; //60; //+(6*INCREMENT); //57+(19*6); //+(29*4); //+29*6;  // debe ser proporcionado por el programa principal
 int level=1;
@@ -362,7 +363,7 @@ void explota_nave_nodriza(){
         }
         put_mothership(232);
 
-        Flush_out;
+       // Flush_out;
 }
 
 int play_mothership(int over_play, int level_ms){
@@ -669,7 +670,7 @@ int play_mothership(int over_play, int level_ms){
        if ( Timer( &headms, 4000L-(level_ms*500) )){ //5500
            avance++;
            if (avance >= 30){
-               system("aplay -q tests/dataPhoenix/condicionRed.wav </dev/null >/dev/null 2>&1 &");
+               system(sound[14]);
            }
            if (avance > 35) {
                reset_bombas();
@@ -708,14 +709,15 @@ int play_mothership(int over_play, int level_ms){
                else if (c==122){    // z= dispara laser antimateria
                    if (!shoot){
                        if (ctaAntimateria){
-                           shoot=4;
+                           shoot=5-level_ms; //4;
                            shooterx = px;
                            shootery = py+5;
                            //swAntimateria = 1; // no sirve con contra nave nodriza
                            strcpy(tipoDisparo,"█");
                            system( sound[2] );
-                           put_am();
                            ctaAntimateria--;
+                           put_am();
+                           
                        }
                    }
                }
@@ -732,14 +734,15 @@ int play_mothership(int over_play, int level_ms){
                else if (c==120){  // x= dispara laser de alta frecuencia
                    if (!shoot){
                        if (ctaAltaFrecuencia ){
-                           shoot=2;
+                           shoot=3-(int)(level_ms/2); //2;
                            shooterx = px;
                            shootery = py+5;
                            //swAltaFrecuencia = 1; // no sirve contra nave nodriza
                            strcpy(tipoDisparo,"▓");
                            system( sound[3] );
-                           put_hf();
                            ctaAltaFrecuencia--;
+                           put_hf();
+                           
                        }
                    }
                }
@@ -761,14 +764,17 @@ int play_mothership(int over_play, int level_ms){
    
    if (acabo_con_todos){
        //reset_bombas();
+       show_info();
        se_eleva_siguiente_mision();
        sleep(1);
        life++;
-       At 10,39; put_big_message("EXTRA core!",46);
+       system(sound[7]);
+       At 30,39; put_big_message("EXTRA core!",46);
        blinking(51,117,life);
        put_life();
-       system(sound[7]);
-       sleep(1);
+       
+       sleep(5);
+       Cls; show_info();
        show_balance(heroe_golpeado, 50000);
    }   
    if ( c==ESCAPE ) swAbort=1;
@@ -841,8 +847,7 @@ Main
      esta línea pretende resolver ese problema. */
    system("ffplay -loglevel -8");
 
-   ///px=50; py=50;
-   ///se_eleva_siguiente_mision();Show_cursor;Stop(1);
+   ///px=50; py=50; show_info(); se_eleva_siguiente_mision();Show_cursor;Stop(1);
    
    ///ctaAltaFrecuencia=20; ctaAntimateria=20; level_ms=4; play_mothership(0, level_ms);Show_cursor;Stop(1);
    
@@ -851,7 +856,7 @@ Main
    //show_balance(0); Show_cursor;Stop(1);
    put_big_title();/// Pause();Show_cursor;Stop(1);
    
-   presentation(sw_play_present);
+   presentation(sw_play_present);// Pause();Show_cursor;Stop(1);
 
 
    while( play_win() ){
@@ -865,27 +870,10 @@ Main
            //goto continuar;
            if ( ! play_mothership(0, level_ms) ){
               break;
-           }/*else{
-              life++;
-              At 10,40; put_big_message("EXTRA core!",46);
-              put_life();
-              system(sound[7]);
-              sleep(5);
-              show_balance(heroe_golpeado, 50000);*/
-              //sleep(2);
-             /* if (!heroe_golpeado){
-                 At 32,40; put_big_message("BONUS:",196);
-                 At 32,64; put_leds(50000,196);
-                 score += 50000;
-                 put_score();
-              }else{
-                 At 31,40; put_big_message("NO BONUS",196);
-
-              }*/
-              //sleep(3);
-           //}
+           }
            ++level_ms;
-           if (level_ms > 4 ) level_ms=4;
+           if (level_ms > 4 ) level_ms=4; // siempre debe tener este tope!
+                                          // de esto depende la etapa de la nave nodriza.
            //continuar:
            //Cls;
        }
@@ -1013,11 +1001,11 @@ int play_win(){
        if( Timer( &tmsg, 4000L )){
            if (resucita<=half_resucita){
                 if( rand()%10<2 ){
-                     system ("aplay -q tests/dataPhoenix/alive.wav </dev/null >/dev/null 2>&1 &");
+                     system (sound[15]); 
                 }
            }else{
                 if( rand()%10<2 ){
-                     system("aplay -q tests/dataPhoenix/condicionRed.wav </dev/null >/dev/null 2>&1 &");
+                     system(sound[14]);
                 }
            }
            if ( rand()%10>swetapa+2 ) swGeometricFly=1; else swGeometricFly=0;
@@ -1372,11 +1360,11 @@ void presentation(int sw_play_present){
     At 25,32 ; put_big_message("= Antimater",123);
     At 29,22 ; put_big_message(" V ",15);
     At 29,32 ; put_big_message("= electromagnetic pulse",123);
-    At 33,32 ; put_big_message("  (destroy bombs)",123);
-    //At 39,15 ; put_big_message("arrow UP ",226);
-    //At 39,52 ; put_big_message("= next level",226);
-    At 43,15 ; put_big_message("arrow DW ",226);
-    At 43,52 ; put_big_message("= stop starship",226);
+    At 33,32 ; put_big_message("  (for bombs, and may be...)",123);
+    At 39,15 ; put_big_message("lateral arrows = move starship",226);
+    ///At 39,71 ; put_big_message("= move starship",226);
+    At 43,15 ; put_big_message("arrow down = stop starship",226);
+    //At 43,57 ; put_big_message("= stop starship",226);
     
     At 50,15 ; put_big_message("Press any key to begin",46);
     
