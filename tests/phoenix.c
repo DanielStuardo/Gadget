@@ -697,6 +697,7 @@ int play_mothership(int over_play, int level_ms){
                if(c == ARROW_LEFT )       { dir=DIR_LEFT; }
                else if(c == ARROW_RIGHT ) { dir=DIR_RIGHT;}
                else if(c == ARROW_DOWN )  { dir=0;}
+               
                else if(c==99){      // c=dispara carga de protones
                    if (!shoot){
                        shoot=1;
@@ -721,7 +722,7 @@ int play_mothership(int over_play, int level_ms){
                        }
                    }
                }
-               else if (c==118){  // v= pulso PEM debil resetea bombas
+               else if (c==100){  // d= pulso PEM debil resetea bombas
                    //if (swetapa<=5){
                        if (ctaPulso){
                            system("aplay -q tests/dataPhoenix/phoenix_PEM.wav </dev/null >/dev/null 2>&1 &");
@@ -1145,6 +1146,7 @@ int play_win(){
                if(c == ARROW_LEFT )       { dir=DIR_LEFT; }
                else if(c == ARROW_RIGHT ) { dir=DIR_RIGHT;}
                else if(c == ARROW_DOWN )  { dir=0;}
+               
                else if(c==99){      // c=dispara carga de protones
                    if (shoot==0){
                        shoot=1;
@@ -1169,7 +1171,7 @@ int play_win(){
                        }
                    }
                }
-               else if (c==118){  // v= pulso PEM debil resetea bombas
+               else if (c==100){  // d= pulso PEM debil resetea bombas
                    //if (swetapa<=4){
                        if (ctaPulso){
                            system("aplay -q tests/dataPhoenix/phoenix_PEM.wav </dev/null >/dev/null 2>&1 &");
@@ -1252,12 +1254,12 @@ void explanation(){
    At 27,5 ; put_big_message("and the survivors managed to",34);
    At 31,5 ; put_big_message("develop an ultimate weapon:",34);
    At 38,5 ; put_big_message("the viking combat ship!",34);
-   sleep(1);
-   typewriting=0;
-   At 50,5 ; put_big_message("Press any key to continue...",46);
-   Pause();
+   sleep(3);
+  // typewriting=0;
+  // At 50,5 ; put_big_message("Press any key to continue...",46);
+  // Pause();
    Cls;
-   typewriting=1;
+  // typewriting=1;
    At  5,5 ; put_big_message("You are the best fighter pilot.", 34);
    sleep(1);
    At  11,5 ; put_big_message("You know there are no force field", 34);
@@ -1269,11 +1271,13 @@ void explanation(){
    At  29,5 ; put_big_message("that mimics the regeneration of", 34);
    At  33,5 ; put_big_message("invaders, but will only allow you", 34);
    At  37,5 ; put_big_message("to be revived seven times.", 34);
-   typewriting=0;
-   At 50,5 ; put_big_message("Press any key to continue...",46);
-   Pause();
+  
+   sleep(3);
+  // typewriting=0;
+  // At 50,5 ; put_big_message("Press any key to continue...",46);
+  // Pause();
    Cls;
-   typewriting=1;
+  // typewriting=1;
 
    At  5,5 ; put_big_message("Your mission is to kill the", 34);
    At  9,5 ; put_big_message("phoenix hordes and destroy their",34);
@@ -1287,9 +1291,10 @@ void explanation(){
    sleep(2);
 
    At 40,5 ; put_big_message("-nop: to not see this report again", 196);
-   typewriting=0;
-   At 50,5 ; put_big_message("Press any key to continue...",46);
-   Pause();
+   sleep(3);
+  // typewriting=0;
+  // At 50,5 ; put_big_message("Press any key to continue...",46);
+  // Pause();
    Cls;
    typewriting=1;
 }
@@ -1358,7 +1363,7 @@ void presentation(int sw_play_present){
     At 21,32 ; put_big_message("= high frecuency",123);
     At 25,22 ; put_big_message(" Z ",15);
     At 25,32 ; put_big_message("= Antimater",123);
-    At 29,22 ; put_big_message(" V ",15);
+    At 29,22 ; put_big_message(" D ",15);
     At 29,32 ; put_big_message("= electromagnetic pulse",123);
     At 33,32 ; put_big_message("  (for bombs, and may be...)",123);
     At 39,15 ; put_big_message("lateral arrows = move starship",226);
@@ -1486,35 +1491,37 @@ void show_balance(int heroe_golpeado, int bonus_base){
 
    //char cequis[1024];
    //sprintf( cequis, "\x1b[19;78H█ █\x1b[20;78H █ \x1b[21;78H█ █");
-   system( sound[13] );
+   if ( !heroe_golpeado )
+       system( sound[13] );
+   
    typewriting=1;
    At 15,20 ; put_big_message("clear zone:",34);
    sleep(1);
    At 15,62 ; put_leds(bonus_base,226);
    sleep(1);
    At 19,36 ; put_big_message("gun hf:",34);
-   sleep(1);
+   if ( !heroe_golpeado ) sleep(1);
    printf( "\x1b[38;5;34m\x1b[19;78H▄ ▄\x1b[20;78H▄▀▄");
    At 19,82 ; put_leds(100,34);
    At 19,62 ; put_leds(ctaAltaFrecuencia,226);
-   sleep(1);
+   if ( !heroe_golpeado ) sleep(1);
    At 23,36 ; put_big_message("gun AM:",34);
-   sleep(1);
+   if ( !heroe_golpeado ) sleep(1);
    printf( "\x1b[38;5;34m\x1b[24;78H▄ ▄\x1b[25;78H▄▀▄");
    At 23,82 ; put_leds(500,34);
    At 23,62 ; put_leds(ctaAntimateria,226);
-   sleep(2);
+   if ( !heroe_golpeado ) sleep(2);
    At 27,46 ; put_big_message("PEM:",34);
-   sleep(1);
+   if ( !heroe_golpeado ) sleep(1);
    printf( "\x1b[38;5;34m\x1b[28;78H▄ ▄\x1b[29;78H▄▀▄");
    At 27,82 ; put_leds(1000,34);
    At 27,62 ; put_leds(ctaPulso,226);
-   sleep(1);
+   if ( !heroe_golpeado ) sleep(1);
    At 31,38 ; put_big_message("bonus:",34);
-   sleep(1);
+   if ( !heroe_golpeado ) sleep(1);
    int bonus = (heroe_golpeado ? 0 : 20000);
    At 31,62 ; put_leds( bonus,226);
-   sleep(3);
+   if ( !heroe_golpeado ) sleep(3);
    At 36,20 ; put_big_message("total bonus: ",46);
    bonus = bonus_base + bonus + (ctaAltaFrecuencia*100) + (ctaAntimateria*500) + (ctaPulso*1000);
    At 36,64 ; put_leds( bonus,226);
@@ -1523,7 +1530,10 @@ void show_balance(int heroe_golpeado, int bonus_base){
    blinking(7, 105, score);
    put_score();
    typewriting=0;
-   sleep(6);
+   if ( !heroe_golpeado )
+       sleep(6);
+   else
+       sleep(3);
    //Pause();
 }
 void blinking(int x, int y, int num){
