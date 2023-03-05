@@ -722,7 +722,7 @@ int play_mothership(int over_play, int level_ms){
                        }
                    }
                }
-               else if (c==100){  // d= pulso PEM debil resetea bombas
+               else if (c==115){  // s= pulso PEM debil resetea bombas
                    //if (swetapa<=5){
                        if (ctaPulso){
                            system("aplay -q tests/dataPhoenix/phoenix_PEM.wav </dev/null >/dev/null 2>&1 &");
@@ -1171,7 +1171,7 @@ int play_win(){
                        }
                    }
                }
-               else if (c==100){  // d= pulso PEM debil resetea bombas
+               else if (c==115){  // s= pulso PEM debil resetea bombas
                    //if (swetapa<=4){
                        if (ctaPulso){
                            system("aplay -q tests/dataPhoenix/phoenix_PEM.wav </dev/null >/dev/null 2>&1 &");
@@ -1363,7 +1363,7 @@ void presentation(int sw_play_present){
     At 21,32 ; put_big_message("= high frecuency",123);
     At 25,22 ; put_big_message(" Z ",15);
     At 25,32 ; put_big_message("= Antimater",123);
-    At 29,22 ; put_big_message(" D ",15);
+    At 29,22 ; put_big_message(" S ",15);
     At 29,32 ; put_big_message("= electromagnetic pulse",123);
     At 33,32 ; put_big_message("  (for bombs, and may be...)",123);
     At 39,15 ; put_big_message("lateral arrows = move starship",226);
