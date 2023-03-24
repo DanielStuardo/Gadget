@@ -229,7 +229,7 @@ Ejecutar con:
 
     ./tests/gamelife.sh
 
-![Nano Game Linux Console](tests/dataGamelife/Captura de pantalla_NANO.png)
+![Nano Game Linux Console](tests/dataGamelife/Captura_de_pantalla_NANO.png)
 
 # Conclusión
 
