@@ -155,13 +155,15 @@ está desplegada en el terminal virtual de GNOME.
 
 # Pacman.
 
+Demo del clásico juego "Pacman", con música de Pacman y Mrs. Pacman.
+
 Compilar con: 
 
     ./ccpre.sh tests/pacman -static
 
 Ejecutar con: 
  
-    ./tests/pacman.sh.
+    ./tests/pacman.sh [-mr|-mrs] [-l <1-5>] [-c]
 
 Ver opciones de ejecución, tipo de sonido, en el código fuente.
 
@@ -199,18 +201,35 @@ Ver opciones de ejecución, tipo de sonido, en el código fuente.
 
 # Phoenix.
 
+Acaba con la amenaza extraterrestre de los "Phoenix", salva a la Tierra.
+
 Compilar con: 
  
     ./ccpre.sh tests/phoenix -static
 
 Ejecutar con: 
 
-    ./tests/phoenix.sh.
+    ./tests/phoenix.sh
 
 Ver opciones de ejecución, tipo de sonido, en el código fuente.
 
 ![Phoenix Game Linux Console](tests/dataPhoenix/Phoenix_scr01.png)
 
+# Nano-bot.
+
+¿Quieres matar cosas virtuales? ¡Mata las bacterias que amenazan la vida de John!
+
+Juego basado en el algoritmo del "Juego de la Vida" de John Conway.
+
+Compilar con: 
+ 
+    ./ccpre.sh tests/gamelife -static
+
+Ejecutar con: 
+
+    ./tests/gamelife.sh
+
+![Nano Game Linux Console](tests/dataGamelife/Captura de pantalla_NANO.png)
 
 # Conclusión
 
