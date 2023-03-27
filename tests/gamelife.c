@@ -38,11 +38,12 @@ const char *cLedsh[3][10] = {{"┏━┓", " ┓ ", " ━┓", " ━┓","┓ �
                              {"┃ ┃", " ┃ ", "┏━┛", " ━┫","┗━┫","┗━┓","┣━┓","  ┃","┣━┫","┗━┫"},
                              {"┗━┛", " ┻ ", "┗━ ", " ━┛","  ┻"," ━┛","┗━┛","  ┻","┗━┛","  ┻"}};
 
-const char* sound[5] = {"aplay -q tests/dataGamelife/dead_bacteria.wav </dev/null >/dev/null 2>&1 &",
+const char* sound[6] = {"aplay -q tests/dataGamelife/dead_bacteria.wav </dev/null >/dev/null 2>&1 &",
                         "aplay -q tests/dataPhoenix/phoenix_laser_antimateria.wav </dev/null >/dev/null 2>&1 &",
                         "aplay -q tests/dataGamelife/bubble.wav </dev/null >/dev/null 2>&1 &",
                         "aplay -q tests/dataGamelife/gamelife_level.wav </dev/null >/dev/null 2>&1 &",
-                        "aplay -q tests/dataGamelife/gamelife_back.wav </dev/null >/dev/null 2>&1 &"
+                        "aplay -q tests/dataGamelife/gamelife_back.wav </dev/null >/dev/null 2>&1 &",
+                        "aplay -q tests/dataGamelife/gamelife_cuenta_puntos.wav </dev/null >/dev/null 2>&1 &"
                        };
 
 void put_heroe( int x, int y);
@@ -50,6 +51,7 @@ void initialize_grid();
 void increment_population( int ncolor);
 int put_shoot();
 int count_bacteries();
+int verify_bacterial_grow();
 void put_leds(int num, int nColorF);
 void put_big_message(char *msg, int nColorF);
 void put_termometer();
@@ -65,6 +67,8 @@ void put_green_point(int x, int y);
 void put_init_play();
 void john_is_dead();
 void kill_all_sounds();
+void bad_message(int type);
+
 
 //int size = 120, sizec=100;
 int shooterx=0, shootery=0, shoot=0;
@@ -78,7 +82,7 @@ int neighbour_count[size][sizec];
 int typewriting=0, time_game=0, level=1, score=0;
 int points[]={100,120,77,130,68,127,55,124,50,127,45,130,37,122,34,129,28,127,20,127,7,127};
 int icolor=0, bact_colours[]={226,118,118,123,255,207,255,118,226,141,196};
-int index_rp=0,game_level=0, life=3;
+int index_rp=0,game_level=-1, life=3;
 // shoot effective versus total shoots:
 unsigned int wrong_shoots, total_shoots;
 
@@ -185,8 +189,8 @@ otra_vez:
         totbacteries = count_bacteries();
         --time_game;
 
-        At 135,70 ; put_leds( time_game,121);
-        At 135,60 ; put_leds( cnt_population,121);
+        At 135,67 ; put_leds( cnt_population,121);
+        At 135,115 ; put_leds( time_game,121);
         put_temp_bar();
         Reset_color;
         if( time_game==0 ) { break; } // pierde
@@ -212,7 +216,9 @@ otra_vez:
                  }
             }
             else if(c==SPACE){
+                 kill_all_sounds();
                  Pause();
+                 system( sound[4] );
             }
             Flush_inp;
         }
@@ -229,26 +235,34 @@ otra_vez:
   sleep(3);
   
   if (totbacteries < 150 && !cnt_population ){
+          if (!verify_bacterial_grow()){
+              bad_message(0);
+              --game_level;
+              goto otra_vez;
+          }else{
+              clear_body();
+              ++level;
+              if ( level > 4 ) level = 4;
+              index_rp+=2;
+              ++icolor;
+              goto otra_vez;
+          }
           
-          clear_body();
-          ++level;
-          if ( level > 4 ) level = 4;
-          index_rp+=2;
-          ++icolor;
-          goto otra_vez;
-  }else if( Is_between( totbacteries, 150, 240 ) ){
+  }else { //if( Is_between( totbacteries, 150, 240 ) ){
           --life;
           put_life(life);
           if( life==0 ){
               john_is_dead();
               put_game_over();
           }else{
+              bad_message(1);
+              --game_level;
               goto otra_vez;
           }
-  }else{
+/*  }else{
           john_is_dead();
           put_game_over();
-          
+  */        
   }
   
   Exception( you_win )
@@ -259,6 +273,25 @@ otra_vez:
 
   Show_cursor;
 End
+
+int verify_bacterial_grow()
+{
+   int nstable=0, newstable=0;
+   int i,j;
+   //int grid_stable[size][sizec];
+   for(i=0; i<size; ++i)
+      for( j=0; j<sizec; ++j)
+          //grid_stable[i][j] = grid[i][j];
+          if (grid[i][j]==1) ++nstable;
+
+   increment_population(0);
+
+   for(i=0; i<size; ++i)
+      for( j=0; j<sizec; ++j)
+          if (grid[i][j]==1) ++newstable;
+    
+   return (nstable >= newstable);
+}
 
 void put_init_play()
 {
@@ -374,6 +407,28 @@ void put_you_win(){
    Pause();
 }
 
+void bad_message(int type)
+{
+   Cls;
+   typewriting=1;
+   At 50,15; put_big_message("the bacterial outbreak",208);
+   At 55,15; put_big_message("(b.o.) could not be",208);
+   At 60,15; put_big_message("controlled...",208);
+   
+   At 67,15; put_big_message("you will have to return",208);
+   At 72,15; put_big_message("to the infected area to",208);
+   At 77,15; put_big_message("stop the new bacterial",208);
+   At 82,15; put_big_message("outbreak.",208);
+   
+   if (type){
+       At 89,15; put_big_message("but...",196);
+       sleep(1);
+       At 94,15; put_big_message("you lost one nanobot.",196);
+   }
+   typewriting=0;
+   Pause();
+}
+
 void john_is_dead(){
    Cls;
 
@@ -398,9 +453,11 @@ void clear_body(){
    typewriting=1;
    system( sound[3] );
    put_green_point(points[index_rp], points[index_rp+1]+8);Flush_out;
-   sleep(1);
-   At 40,43 ; put_big_message("CLEAR BODY!",121);
+
+   At 35,43 ; put_big_message("CLEAR BODY!",226);
    sleep(3);
+   At 48,15; put_big_message("total shoots:",121);
+   At 48,67; put_leds( total_shoots,255);
    At 55,15; put_big_message("Effective shoots:",121);
    unsigned effective_shoots = total_shoots - wrong_shoots;
    if (effective_shoots<0) effective_shoots=1;
@@ -425,14 +482,15 @@ void clear_body(){
    
    At 76,15; put_big_message("score: ",121);
    At 76,38; put_leds( score,255);
+   system( sound[5] );
    do{
         score += 10;
         bonus -= 10;
         At 69,38; put_leds( bonus,255);
         At 76,38; put_leds( score,255);
-        usleep(1000);
+        usleep(10000);
    }while(bonus);
-
+   kill_all_sounds();
    sleep(1);
    Pause();
 }
@@ -457,7 +515,7 @@ void put_termometer()
 {
    int ntemp=0, t=0;
    typewriting=0;
-   At 135,2 ; put_big_message("temperature",34);
+   At 135,2 ; put_big_message("temperature    B.O.      batt. time:",34);
    Color_fore(255);
 
    Iterator up t [1:10:100]{
