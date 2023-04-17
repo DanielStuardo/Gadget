@@ -173,6 +173,28 @@ Ver opciones de ejecución, tipo de sonido, en el código fuente.
 
 ![Pacman Game Linux Console](tests/dataPacman/pacmanp3.png)
 
+#Tetris - clásico.
+
+Demo del clásico juego "Tetris", con música del juego de Nintendo.
+
+Compilar con:
+
+     ./ccpre.sh tests/tetris -static
+
+Ejecutar con:
+
+     ./tests/tetris.sh [opciones]
+
+![Tetris Game Linux Console](tests/dataTetris/Tetris_01.png)
+
+![Tetris Game Linux Console](tests/dataTetris/Tetris_02.png)
+
+![Tetris Game Linux Console](tests/dataTetris/Tetris_03.png)
+
+![Tetris Game Linux Console](tests/dataTetris/Tetris_04.png)
+
+![Tetris Game Linux Console](tests/dataTetris/Tetris_05.png)
+
 # Tabla periódica de los elementos.
 
 ![Periodic Linux Console](tests/Tabla_periodica_rosetta_code_02.png)
