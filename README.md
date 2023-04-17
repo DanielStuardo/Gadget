@@ -195,6 +195,8 @@ Ejecutar con:
 
 ![Tetris Game Linux Console](tests/dataTetris/Tetris_05.png)
 
+![Tetris Game Linux Console](tests/dataTetris/Tetris_06.png)
+
 # Tabla periódica de los elementos.
 
 ![Periodic Linux Console](tests/Tabla_periodica_rosetta_code_02.png)
