@@ -173,7 +173,7 @@ Ver opciones de ejecución, tipo de sonido, en el código fuente.
 
 ![Pacman Game Linux Console](tests/dataPacman/pacmanp3.png)
 
-#Tetris - clásico.
+# Tetris - clásico.
 
 Demo del clásico juego "Tetris", con música del juego de Nintendo.
 
