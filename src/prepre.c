@@ -1092,12 +1092,12 @@ int Busca_Print(int fd, int numLine){
               buffer[0] = tbuffer[0];
               buffer[1] = '\0';
               read( fd, tbuffer, 1 );
-              if(tbuffer[0]=='/'){
+              /*if(tbuffer[0]=='/'){
                   //Descarta_cometario_linea(fd,buffer);
                   Msg_redf("\nPrint:Encontré un comentario de línea donde no debía estar, en línea %d 😝\n",numLine);
                   retVal=1;
                   break;
-              }else if(tbuffer[0]=='*'){
+              }else */ if(tbuffer[0]=='*'){
                   Descarta_comentario_bloque(fd,&numLine,buffer);
                   continue;
               }else{
@@ -1114,28 +1114,50 @@ int Busca_Print(int fd, int numLine){
            retVal = Busca_Cell(fd,numLine,0);
        
        }else if( tbuffer[0]=='"' ){ // es un string
+           int swc=0;
            while( ! Eof(fd) ){
-               printf("%c",tbuffer[0]);
-               char buffBefore = tbuffer[0];
+               //printf("%c",tbuffer[0]);
+               if ( tbuffer[0] == '\\' ){
+                   printf("%c",tbuffer[0]);
+                   read( fd, tbuffer, 1 );
+                   
+                   if ( tbuffer[0] == '\\' ){
+                       printf("%c",tbuffer[0]);
+                       read( fd, tbuffer, 1 );
+                       printf("%c",tbuffer[0]);
+                       if( tbuffer[0] == 34 ) break;
+                   }else{
+                       printf("%c",tbuffer[0]);
+                   } ///if( tbuffer[0] == 34 ) break;
+               }else if( tbuffer[0] == 34 ){
+                   printf("%c",tbuffer[0]);
+                   ++swc;
+                   if (swc==2) break;
+               }else  printf("%c",tbuffer[0]);
+               read( fd, tbuffer, 1 );
+               /*char buffBefore = tbuffer[0];
                read( fd, tbuffer, 1 );
                if ( tbuffer[0] == 34 ){
                    if(buffBefore != '\\') { // es el cierre del string
                        printf("%c",tbuffer[0]);
                        break;
                    }
-               }
+               }*/
            }
        }else if( tbuffer[0]=='\\' ){  // sigue en siguiente linea
            swFinallinea=1;
            
-       }else if( tbuffer[0]!=';' ) {
-           //Cat( vars, tbuffer );
-           printf("%s",tbuffer);
+       }else {
+          if( tbuffer[0]!=';' ) {
+             //Cat( vars, tbuffer );
+             printf("%s",tbuffer);
+           
       
-       }else{
-           //Cat( vars, ");" );
-           printf(");");
-           break;
+          }else{
+             //Cat( vars, ");" );
+             printf(");");
+             break;
+          }
        }
    }
    if( Eof(fd) ){
@@ -1572,7 +1594,9 @@ int Busca_Declare_String(int fd, int numLine){
                   continue;
               }else{
                   vars[c++] = tbuffer[0];
-                  vars[c++] = buffer[0];
+                  //vars[c++] = buffer[0];  
+                  /* FIX: no evalúa la constante de cadena, luego, interpreta mal las rutas de archivo.
+                          Esto hace que se repita buffer[0] más adelante */
               }
           }
           
