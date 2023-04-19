@@ -54,7 +54,7 @@ void Save_score(int score, int high);
 void Put_time_bonus(int timeBonus);
 void You_win(int type);
 void Compute_time(int *timeBonus);
-void Change_colors();
+void Change_colors(), Check_color_block();
 void Show_statistics(int score, int high, int level, int total_lines);
 void Use_mode(){
     //Color(196,232);
@@ -72,10 +72,10 @@ void Use_mode(){
     printf(" -d1,-d2  cosaco dance.\n");
     printf(" -b1..-b5 change blocks.\n");
     printf(" -r       retro screen.\n");
-    printf(" -k       kaleidoscope.\n");
+    printf(" -a       amber screen.\n");
     printf(" -h       this help.\n\n");
     
-    printf(" Programmed by\n\n\t Mr.Dalien\n\t 2023");
+    printf(" Programmed by\n\t Mr.Dalien\n\t 2023");
     //printf("for Linux.\n");
     Flush_out;
     Pause();
@@ -99,7 +99,6 @@ int cosaco_dance=-1;
 int block_type=0; /* bloque por defecto */
 int counter_tetromino=0; /* contador de piezas repetidas. Si una pieza se repite más de 3 veces, se escoge otra */
 int green_blocks=0;   /* blocks y matriz de juego de color verde con fondo oscuro */
-int kaleidoscope=0;   /* kaleidoscopio */
 int wide=13;
 
 GD_VIDEO field, next_box;
@@ -151,13 +150,11 @@ Main
             }else if( Is_equal_str(opt_play,"-b5") ){  // tipo de bloque alternativo
                 block_type=4;
             }
+            if( Is_equal_str(opt_play,"-a") ){  // block ambar y rojo
+                green_blocks=2;
+            }
             if( Is_equal_str(opt_play,"-r") ){  // block verde
                 green_blocks=1;
-                kaleidoscope=0;
-            }
-            if( Is_equal_str(opt_play,"-k") ){  // block kaleidoscopio: funde retinas.
-                kaleidoscope=1;
-                green_blocks=0;
             }
             if( Is_equal_str(opt_play,"-h") ){  // help
                 Use_mode();
@@ -180,11 +177,7 @@ Main
         Stop(1);
     }
     
-    if (green_blocks ){
-        tetrimino_color[0]=tetrimino_color[3]=tetrimino_color[6]=70; // 34
-        tetrimino_color[1]=tetrimino_color[2]=46;
-        tetrimino_color[5]=tetrimino_color[4]=255;
-    }
+    Check_color_block();
     
     Presentation(complexity);
     
@@ -266,9 +259,9 @@ Main
                                                      Print_blocks(1,0);
                                                  }
                                                  break; }
-                    else if( toupper(c) == 'K'  || toupper(c) == 'R' ) { if( sw_play_present ) system(sound[10]);
+                    else if( c == ARROW_UP || toupper(c) == 'K'  || toupper(c) == 'R' ) { if( sw_play_present ) system(sound[10]);
                                                                          Get_right_rotation(); }
-                    else if( toupper(c) == 'J'  || toupper(c) == 'E' ) { if( sw_play_present ) system(sound[10]);
+                    else if( c == ARROW_DOWN || toupper(c) == 'J'  || toupper(c) == 'E' ) { if( sw_play_present ) system(sound[10]);
                                                                          Get_left_rotation(); }
                     else if( toupper(c) == SPACE ) {
                            if( !Down_piece() ){
@@ -284,6 +277,7 @@ Main
                     }
                 }
                 Print_blocks(1,0);
+                Flush_inp;
             }
         }
         if( sw_play_present )
@@ -376,8 +370,8 @@ End
 int Load_high_score()
 {
    int high=0;
-   String file;
-   Let (file, "tests/dataTetris/high");
+   String file="tests/dataTetris/high";
+//   Let (file, "tests/dataTetris/high");
    
    switch(complexity){
        case 1: { Cat( file, "_normal.txt" ); break; }
@@ -397,9 +391,9 @@ int Load_high_score()
 
 void Save_score(int score, int high)
 {
-   String file;
+   String file = "tests/dataTetris/high";
    
-   Let( file, "tests/dataTetris/high");
+   //Let( file, "tests/dataTetris/high");
    switch(complexity){
        case 1: { Cat( file, "_normal.txt" ); break; }
        case 2: { Cat( file, "_middle.txt" ); break; }
@@ -430,6 +424,19 @@ void Verify_level( int * level, int total_lines)
 {
    /* cada 10 líneas borradas, aumenta un nivel */
     *level = (int)(total_lines/10+1);
+}
+
+void Check_color_block()
+{
+    if (green_blocks==1 ){
+        tetrimino_color[0]=tetrimino_color[3]=tetrimino_color[6]=70; // 34
+        tetrimino_color[1]=tetrimino_color[2]=46;
+        tetrimino_color[5]=tetrimino_color[4]=255;
+    }else if(green_blocks==2){
+        tetrimino_color[0]=tetrimino_color[3]=tetrimino_color[6]=202; // 34
+        tetrimino_color[1]=tetrimino_color[2]=226;
+        tetrimino_color[5]=tetrimino_color[4]=255;
+    }
 }
 
 void Change_colors()
@@ -919,7 +926,7 @@ int Down_piece()
 
 void Put_statistics()
 {
-    Color(green_blocks ? 70 : 214,232); // 214
+    Color(green_blocks==1 ? 70 : green_blocks==2 ? 202 : 214, 232); // 214
     int i;
     Iterator up i [0:1:7]{
         At 9+(2*i), 10; Print "=%3d", tetrimino_count[i];
@@ -1032,11 +1039,14 @@ void Put_next_piece()
 void Init_array_base()
 {
     int i,j;
-    Iterator up i[0:1:ROWS]{
+    DS_ARRAY base_data;
+    Range for base [0:1:ROWS, 0:1:COLUMNS];
+    Compute_for (base, i,j, base[i][j] = 0 )
+/*    Iterator up i[0:1:ROWS]{
         Iterator up j[0:1:COLUMNS]{
             base[i][j] = 0;
         }
-    }
+    }*/
 }
 
 int Verify_full_lines(long *time)
@@ -1118,11 +1128,7 @@ void Print_blocks(int type, int init)
            At i+2, j+3+wide;
            if ( type == 1 ){
                 if ( base[i][j] ){
-                    if( kaleidoscope ){
-                         Color(rand()%256,232); //Print "%s", block;
-                    }else{
-                         Color(base[i][j],232);
-                    }
+                    Color(base[i][j],232);
                     Print "%s", block;
                     
                 }else{
@@ -1183,7 +1189,7 @@ void Put_time_bonus(int timeBonus)
 
 void Put_points(int score, int high, int level, int lines)
 {
-    Color(46,232); Bold;
+    Color(green_blocks==1 ? 46: green_blocks==2 ? 202 : 255,232); Bold;
     At 10,15+wide; Print "%*d",7, score;
     At 13,15+wide; Print "%*d",7, high;
     At 16,16+wide; Print "%3d", level;
@@ -1210,7 +1216,7 @@ GD_VIDEO Put_field(GD_VIDEO field, int complexity)
     String block="\u25A3", block2="\u25A3\u25A3", bound="\u25c6";
     String block3="\u25A3\u25A3\u25A3",block4="\u25A3\u25A3\u25A3\u25A3";
     int i;
-    Color_fore(field, green_blocks ? 22:240);
+    Color_fore(field, green_blocks==1 ? 22: green_blocks==2 ? 130 : 240);
     Color_back(field, 234);
     Iterator up i [1:1:22]{
         Outvid(field,i,2+wide, bound);
@@ -1224,7 +1230,7 @@ GD_VIDEO Put_field(GD_VIDEO field, int complexity)
     
     Free secure bound;
     
-    Color_back(field,green_blocks ? 70 : 196); 
+    Color_back(field,green_blocks==1 ? 70 : green_blocks==2 ? 202 : 196); 
     Color_fore(field,232);
     Outvid(field,6,2,"\033[1m-STATISTICS-\033[22m");
     Reset_text(field);
@@ -1247,7 +1253,7 @@ GD_VIDEO Put_field(GD_VIDEO field, int complexity)
       
     Free secure block,block2,block3,block4;
 
-    Color_fore(field,green_blocks ? 28 : 196); // 82
+    Color_fore(field,green_blocks==1 ? 28 : green_blocks==2 ? 166 :196); // 82
     Color_back(field,232);
     
     Outvid(field,9, 14+wide, "\033[1m┏━SCORE━┓");
@@ -1269,16 +1275,16 @@ GD_VIDEO Put_field(GD_VIDEO field, int complexity)
     Reset_text(field);
     if (complexity==1){
         Color_fore(field,green_blocks ? 46 : 46);
-        Outvid(field, 4,  21+wide, "NORMAL");
+        Outvid(field, 3,  21+wide, "NORMAL");
     }else if (complexity==2){
         Color_fore(field,green_blocks ? 46 : 226);
-        Outvid(field, 4,  21+wide, "MIDDLE");
+        Outvid(field, 3,  21+wide, "MIDDLE");
     }else if (complexity==3){
         Color_fore(field,green_blocks ? 46 : 202);
-        Outvid(field, 4,  21+wide, "HARD");
+        Outvid(field, 3,  21+wide, "HARD");
     }else if (complexity==4){
         Color_fore(field,green_blocks ? 46 : 196);
-        Outvid(field, 4,  21+wide, "RUDE");
+        Outvid(field, 3,  21+wide, "RUDE");
     }
 
     return field;
@@ -1560,7 +1566,7 @@ void Show_cosaco_mov3(int fila, int columna)
 void Show_cosaco_mov4(int fila, int columna)
 {
    system( sound[6]);
-   At fila,   columna;  Color_fore(121); printf( "  \\" );
+   At fila,   columna;  Color_fore(121); Print "  \\"; //printf( "  \\" );
    Color_fore(113); printf( " ### ");
    Color_fore(121); printf( "/   ");
 
